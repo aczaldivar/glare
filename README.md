@@ -18,8 +18,9 @@ Walk in → name or join a room → talk live → share the room link.
 - Safety basics: 13+ notice (not age verification), Community Guidelines / Terms acknowledgment before entering a room, 500-character messages, burst rate limits, plain-text only, in-app report stub, mute/block in this browser
 - In-app **Terms of Service**, **Privacy**, and **Community Guidelines** (plain-language product drafts)
 - Footer links to those pages; no analytics or advertising cookies in v1
+- **Podcast rooms (demo):** curated episode + transcript + live chat at `/r/lobby-ep1`. Not a public podcast host yet.
 
-Featured room to share: `/r/lobby`.
+Featured room to share: `/r/lobby`. Demo podcast room: `/r/lobby-ep1`.
 
 ## Stack
 
@@ -147,6 +148,23 @@ v1 does **not** have a durable message database:
 
 A scheduled deletion job against durable storage is **out of scope for v1**. When a database exists, reuse `MESSAGE_RETENTION_DAYS` / `MESSAGE_RETENTION_MS` for that job instead of inventing a second policy.
 
+## Podcast rooms (demo, not publicly launchable)
+
+A room slug can be tied to a **curated** episode: HTML5 audio (or later an approved embed), a full English transcript, and the same live chat. Chat is the discussion; the transcript is first-class (readable and searchable). Share `/r/{slug}`.
+
+**Do not treat podcast rooms as a public product until Terms and Privacy are patched for that format.** v1 has no user audio/transcript upload UI. Official / rights-clear / in-repo demo files only.
+
+Demo: `/r/lobby-ep1` — original English copy plus synthetic tones at `public/audio/demo-episode.mp3` (royalty-free, generated). Transcript lives in `src/lib/podcast/demo-episode.ts` and is sanitized to plain text before render (no raw HTML).
+
+### Add an episode
+
+1. Put rights-clear audio in `public/audio/` (or use an approved embed URL — then update CSP `frame-src` if needed).
+2. Add a `PodcastEpisode` to the catalog in `src/lib/podcast/catalog.ts` (`roomSlug`, `title`, `audioUrl`, `durationMs`, `language: "en"`, `transcript: TranscriptCue[]`).
+3. Optional `contentWarning` shows a banner.
+4. Quote-to-chat is required for citing a line (Quote on a cue fills the composer).
+
+English-only in v1. Existing legal gates still apply (13+ notice, Guidelines/Terms ack, mute/block, report).
+
 ## Legal copy (drafts, not counsel)
 
 The Terms of Service, Privacy Policy, and Community Guidelines in this repo are **plain-language product drafts** written so Anna can ship a public URL with a visible safety layer. They are **not formal legal advice** and have not been reviewed by an attorney.
@@ -162,5 +180,5 @@ src/app/api/realtime    Config, Ably tokens, messages, local SSE/presence
 src/app/api/reports     Abuse report intake
 src/components          Landing, room, legal, safety UI
 src/hooks               Identity, realtime, legal ack, local mute/block
-src/lib                 Validation, rate limit, legal copy, retention, providers
+src/lib                 Validation, rate limit, legal copy, retention, podcast catalog, providers
 ```

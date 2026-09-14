@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { RoomView } from "@/components/room-view";
+import { PodcastRoomView } from "@/components/podcast-room-view";
 import { APP_NAME } from "@/lib/constants";
+import { getPodcastEpisode } from "@/lib/podcast/catalog";
 import { isValidRoomSlug, roomDisplayName, slugifyRoom } from "@/lib/rooms";
 
 export async function generateMetadata({
@@ -13,6 +15,13 @@ export async function generateMetadata({
   const slug = slugifyRoom(room);
   if (!isValidRoomSlug(slug)) {
     return { title: "Room not found" };
+  }
+  const episode = getPodcastEpisode(slug);
+  if (episode) {
+    return {
+      title: episode.title,
+      description: `${episode.title} on ${APP_NAME}. Listen, read the transcript, and talk live — no account required.`,
+    };
   }
   const name = roomDisplayName(slug);
   return {
@@ -30,5 +39,9 @@ export default async function RoomPage({
   const slug = slugifyRoom(decodeURIComponent(room));
   if (!isValidRoomSlug(slug)) notFound();
   if (slug !== room) redirect(`/r/${slug}`);
+  const episode = getPodcastEpisode(slug);
+  if (episode) {
+    return <PodcastRoomView key={slug} episode={episode} />;
+  }
   return <RoomView key={slug} room={slug} />;
 }

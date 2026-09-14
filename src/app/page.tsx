@@ -51,6 +51,16 @@ export default function Home() {
                   </span>
                 </Link>
               ))}
+              <Link
+                href={roomPath("lobby-ep1")}
+                title="Demo podcast episode"
+                className="inline-flex min-h-11 items-center rounded-full border border-glare/30 px-4 text-sm text-glare transition hover:border-glare/60 hover:text-glare-hot"
+              >
+                #lobby-ep1
+                <span className="ml-2 hidden text-xs text-muted/70 lg:inline">
+                  Demo episode
+                </span>
+              </Link>
             </div>
             <p className="mt-5 text-xs leading-5 text-ember">{SAFETY_BANNER}</p>
           </div>

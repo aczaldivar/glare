@@ -1,4 +1,4 @@
-export const LEGAL_ACK_VERSION = 1;
+export const LEGAL_ACK_VERSION = 2;
 export const LEGAL_ACK_STORAGE_KEY = "glare.legal.ack.v1";
 export const LEGAL_ACK_EVENT = "glare-legal-ack";
 export const BLOCKS_STORAGE_KEY = "glare.blocks.v1";
@@ -84,6 +84,13 @@ export const GUIDELINES: LegalDoc = {
       ],
     },
     {
+      heading: "Podcast rooms",
+      body: [
+        "Some rooms are tied to a curated episode. Read the transcript and talk in chat. If you cite a line, quote it from the transcript.",
+        "The same public-room rules apply. This demo is English-only. There is no user audio upload.",
+      ],
+    },
+    {
       heading: "Contact",
       body: [
         "Email contact@glare.com about these guidelines. You can also use Report in a room to flag abuse on this instance.",
@@ -146,6 +153,13 @@ export const TERMS: LegalDoc = {
       body: [
         "We may update these terms as the product changes. If we make a material change, we may ask you to acknowledge the new version before entering a room again.",
         "If a court finds a part of these terms unenforceable, the rest still applies.",
+      ],
+    },
+    {
+      heading: "Podcast rooms (demo)",
+      body: [
+        "A podcast room can pair curated audio with a transcript and live chat. v1 ships a demo episode only. There is no user audio or transcript upload.",
+        "Do not treat podcast rooms as a public podcast host until these terms and the Privacy Policy are reviewed and patched for that product.",
       ],
     },
     {
@@ -221,6 +235,13 @@ export const PRIVACY: LegalDoc = {
       heading: "Children",
       body: [
         "Glare Room is for ages 13 and up. We show that notice and do not verify age. Do not use it to share information about minors or to contact them. We will remove apparent child sexual abuse material and related exploitation without notice.",
+      ],
+    },
+    {
+      heading: "Podcast rooms",
+      body: [
+        "Demo episodes are static audio and transcript files we ship. v1 does not collect user-uploaded audio or transcripts.",
+        "Chat in a podcast room is the same public chat described above. Patch this policy before treating podcast rooms as a public product.",
       ],
     },
     {
