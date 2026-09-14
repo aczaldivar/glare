@@ -4,7 +4,7 @@
   --bg: #08080a;
   --bg-elev: rgba(18, 18, 22, 0.78);
   --ink: #f6f1e8;
-  --muted: #a39b8f;
+  --muted: #b8b0a4;
   --line: rgba(255, 236, 210, 0.1);
   --glare: #ffd9a0;
   --glare-hot: #fff6e0;
@@ -128,6 +128,11 @@ input,
 button,
 textarea {
   font: inherit;
+}
+
+.bg-glare:focus-visible {
+  outline: 2px solid var(--glare-hot);
+  outline-offset: 3px;
 }
 
 ::selection {

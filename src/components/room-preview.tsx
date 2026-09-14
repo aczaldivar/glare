@@ -6,7 +6,7 @@ const PREVIEW = [
 
 export function RoomPreview() {
   return (
-    <aside className="panel rise-in hidden overflow-hidden rounded-[28px] lg:block">
+    <aside className="panel rise-in hidden overflow-hidden rounded-[28px] lg:row-span-2 lg:block">
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted">

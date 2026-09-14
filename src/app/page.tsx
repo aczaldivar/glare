@@ -20,8 +20,8 @@ export default function Home() {
         </Link>
       </header>
 
-      <main className="grid flex-1 items-center gap-12 py-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:gap-16">
-        <section className="rise-in">
+      <main className="grid flex-1 grid-cols-1 gap-x-16 gap-y-10 py-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:grid-rows-[auto_auto] lg:items-start lg:py-12">
+        <section className="rise-in flex min-h-[calc(100dvh-8.5rem)] flex-col justify-center lg:min-h-0">
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-glare/80">
             Public rooms · live conversation · 13+
           </p>
@@ -42,39 +42,42 @@ export default function Home() {
                 <Link
                   key={room.slug}
                   href={roomPath(room.slug)}
-                  className="rounded-full border border-line px-3 py-1.5 text-sm text-muted transition hover:border-glare/40 hover:text-ink"
+                  title={room.blurb}
+                  className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm text-muted transition hover:border-glare/40 hover:text-ink"
                 >
                   #{room.slug}
-                  <span className="ml-2 text-xs text-muted/70">{room.blurb}</span>
+                  <span className="ml-2 hidden text-xs text-muted/70 lg:inline">
+                    {room.blurb}
+                  </span>
                 </Link>
               ))}
             </div>
             <p className="mt-5 text-xs leading-5 text-ember">{SAFETY_BANNER}</p>
           </div>
-
-          <dl className="mt-8 grid gap-4 text-sm text-muted sm:grid-cols-3">
-            <div>
-              <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-glare/70">
-                01
-              </dt>
-              <dd className="mt-1 text-ink">Name a room. The URL is the invite.</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-glare/70">
-                02
-              </dt>
-              <dd className="mt-1 text-ink">Walk in with a display name — or skip it.</dd>
-            </div>
-            <div>
-              <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-glare/70">
-                03
-              </dt>
-              <dd className="mt-1 text-ink">Messages land live. Presence shows who&apos;s here.</dd>
-            </div>
-          </dl>
         </section>
 
         <RoomPreview />
+
+        <dl className="grid gap-4 text-sm text-muted sm:grid-cols-3 lg:col-start-1">
+          <div>
+            <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-glare/70">
+              01
+            </dt>
+            <dd className="mt-1 text-ink">Name a room. The URL is the invite.</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-glare/70">
+              02
+            </dt>
+            <dd className="mt-1 text-ink">Walk in with a display name — or skip it.</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-[11px] uppercase tracking-[0.2em] text-glare/70">
+              03
+            </dt>
+            <dd className="mt-1 text-ink">Messages land live. Presence shows who&apos;s here.</dd>
+          </div>
+        </dl>
       </main>
 
       <SiteFooter />

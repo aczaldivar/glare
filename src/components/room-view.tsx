@@ -152,22 +152,36 @@ function RoomLive({ room }: { room: string }) {
           </Link>
           <button
             type="button"
+            aria-expanded={peopleOpen}
+            aria-controls="room-people"
             onClick={() => setPeopleOpen((open) => !open)}
-            className="inline-flex items-center gap-2 rounded-full border border-line px-3 py-1.5 text-xs text-muted sm:hidden"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-3 py-1.5 text-xs text-muted sm:hidden"
           >
             <span className="live-dot size-1.5 rounded-full bg-live" />
-            {people.length || 1}
+            People in room
+            <span className="text-ink/80">{people.length || 1}</span>
           </button>
         </div>
         <div className="min-w-0 flex-1 sm:text-center">
           <p className="font-mono text-[11px] uppercase tracking-[0.26em] text-muted">
-            Public room
+            Public room · /r/{room}
           </p>
           <h1 className="truncate font-display text-3xl italic text-ink sm:text-4xl">
             {title}
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <NameChip
+            identity={identity}
+            editing={editingName}
+            nameDraft={nameDraft}
+            onNameDraft={setNameDraft}
+            onStartEdit={() => {
+              setNameDraft(identity.name);
+              setEditingName(true);
+            }}
+            onSave={onSaveName}
+          />
           <span className="hidden items-center gap-2 rounded-full border border-line px-3 py-1.5 text-xs text-muted sm:inline-flex">
             <span
               className={`size-1.5 rounded-full ${
@@ -180,7 +194,7 @@ function RoomLive({ room }: { room: string }) {
           <button
             type="button"
             onClick={shareRoom}
-            className="rounded-full bg-glare px-4 py-2 text-xs font-semibold tracking-wide text-[#2a1c0a] transition hover:bg-glare-hot"
+            className="min-h-11 rounded-full bg-glare px-4 text-xs font-semibold tracking-wide text-[#2a1c0a] transition hover:bg-glare-hot"
           >
             {copied ? "Copied" : "Share link"}
           </button>
@@ -191,6 +205,7 @@ function RoomLive({ room }: { room: string }) {
 
       <div className="grid min-h-0 flex-1 gap-4 pb-4 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside
+          id="room-people"
           className={`panel rounded-[24px] p-4 ${peopleOpen ? "block" : "hidden"} lg:block`}
         >
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
@@ -228,44 +243,6 @@ function RoomLive({ room }: { room: string }) {
         </aside>
 
         <section className="panel flex min-h-[70dvh] flex-col overflow-hidden rounded-[24px] lg:min-h-0">
-          <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
-            {editingName ? (
-              <form onSubmit={onSaveName} className="flex min-w-0 flex-1 items-center gap-2">
-                <input
-                  value={nameDraft}
-                  onChange={(event) => setNameDraft(event.target.value)}
-                  maxLength={MAX_NAME_LENGTH}
-                  className="h-10 min-w-0 flex-1 rounded-xl border border-line bg-black/30 px-3 text-sm outline-none focus:border-glare/50"
-                  autoFocus
-                />
-                <button
-                  type="submit"
-                  className="h-10 rounded-xl bg-glare px-3 text-xs font-semibold text-[#2a1c0a]"
-                >
-                  Save
-                </button>
-              </form>
-            ) : (
-              <p className="text-sm text-muted">
-                You&apos;re{" "}
-                <span className="text-ink">{identity.name}</span>
-                <button
-                  type="button"
-                  className="ml-2 text-glare underline-offset-4 hover:underline"
-                  onClick={() => {
-                    setNameDraft(identity.name);
-                    setEditingName(true);
-                  }}
-                >
-                  Change
-                </button>
-              </p>
-            )}
-            <p className="hidden font-mono text-[11px] text-muted sm:block">
-              /r/{room}
-            </p>
-          </div>
-
           {channel.notice ? (
             <div className="border-b border-line bg-ember/10 px-4 py-3 text-sm text-ember sm:px-5">
               {channel.notice}
@@ -286,6 +263,17 @@ function RoomLive({ room }: { room: string }) {
                   Say something. Anyone with the link can walk in — no account
                   required.
                 </p>
+                {/* Ethics: light civility nudge for empty rooms. Refine copy later; no heavy filter. */}
+                <p className="mt-3 max-w-sm text-xs text-muted">
+                  Public room. Be decent with the people who walk in.
+                </p>
+                <button
+                  type="button"
+                  onClick={shareRoom}
+                  className="mt-5 inline-flex min-h-11 items-center rounded-full border border-line px-5 text-sm text-muted transition hover:border-glare/40 hover:text-ink"
+                >
+                  {copied ? "Copied" : "Share link"}
+                </button>
               </div>
             ) : (
               visibleMessages.map((message, index) => (
@@ -317,12 +305,12 @@ function RoomLive({ room }: { room: string }) {
                 placeholder="Write to the room"
                 maxLength={MAX_MESSAGE_LENGTH}
                 disabled={channel.connection === "offline"}
-                className="h-11 flex-1 bg-transparent px-3 text-sm text-ink outline-none placeholder:text-muted disabled:opacity-50"
+                className="h-11 min-h-11 flex-1 bg-transparent px-3 text-sm text-ink outline-none placeholder:text-muted disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={!normalizeMessageText(draft) || channel.connection === "offline"}
-                className="h-11 shrink-0 whitespace-nowrap rounded-xl bg-glare px-5 text-sm font-semibold text-[#2a1c0a] transition hover:bg-glare-hot disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex h-11 min-h-11 min-w-11 shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-glare px-5 text-sm font-semibold text-[#2a1c0a] transition hover:bg-glare-hot disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Send
               </button>
@@ -330,11 +318,18 @@ function RoomLive({ room }: { room: string }) {
             <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-muted">
               <span>
                 {sendError ??
-                  "500-character cap · rate limited · report harm when you see it."}
+                  (channel.connection === "offline"
+                    ? channel.notice ??
+                      "You're offline. Messages will send when the room is live again."
+                    : "500-character cap · rate limited · report harm when you see it.")}
               </span>
-              <span className={remaining <= 40 ? "text-ember" : ""}>
-                {remaining}
-              </span>
+              {remaining <= 50 ? (
+                <span className={remaining <= 40 ? "text-ember" : ""}>
+                  {remaining}
+                </span>
+              ) : (
+                <span className="sr-only">{remaining} characters left</span>
+              )}
             </div>
           </form>
         </section>
@@ -342,6 +337,60 @@ function RoomLive({ room }: { room: string }) {
 
       <SiteFooter compact />
     </div>
+  );
+}
+
+function NameChip({
+  identity,
+  editing,
+  nameDraft,
+  onNameDraft,
+  onStartEdit,
+  onSave,
+}: {
+  identity: Identity;
+  editing: boolean;
+  nameDraft: string;
+  onNameDraft: (value: string) => void;
+  onStartEdit: () => void;
+  onSave: (event: FormEvent) => void;
+}) {
+  if (editing) {
+    return (
+      <form onSubmit={onSave} className="flex min-w-0 items-center gap-2">
+        <input
+          value={nameDraft}
+          onChange={(event) => onNameDraft(event.target.value)}
+          maxLength={MAX_NAME_LENGTH}
+          aria-label="Display name"
+          className="h-11 min-h-11 min-w-0 max-w-40 rounded-full border border-line bg-black/30 px-3 text-sm outline-none focus:border-glare/50"
+          autoFocus
+        />
+        <button
+          type="submit"
+          className="inline-flex h-11 min-h-11 min-w-11 items-center justify-center rounded-full bg-glare px-3 text-xs font-semibold text-[#2a1c0a]"
+        >
+          Save
+        </button>
+      </form>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onStartEdit}
+      className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-line px-2 py-1 text-left transition hover:border-glare/40"
+      aria-label={`Display name ${identity.name}. Click to rename.`}
+    >
+      <span
+        className="flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-[#1a1208]"
+        style={{ background: colorFromId(identity.id) }}
+      >
+        {initialsFromName(identity.name)}
+      </span>
+      <span className="truncate pr-2 text-sm text-ink">{identity.name}</span>
+    </button>
   );
 }
 

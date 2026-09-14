@@ -31,6 +31,7 @@ export const SUGGESTED_ROOMS = [
   { slug: "studio", label: "Studio", blurb: "Work in public" },
   { slug: "rooftop", label: "Rooftop", blurb: "Open air" },
 ] as const;
+// Landing chips render #slug (min 44px tap). Blurb is the title tooltip; desktop may show it as a subtitle.
 
 export const RESERVED_ROOM_SLUGS = new Set([
   "api",
