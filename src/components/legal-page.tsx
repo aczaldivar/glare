@@ -8,16 +8,9 @@ import {
 } from "@/lib/legal";
 import { getOperatorContactEmail } from "@/lib/operator";
 
-function sectionBody(heading: string, paragraphs: string[]) {
-  if (heading !== "Contact") return paragraphs;
-  const email = getOperatorContactEmail();
-  if (!email) return paragraphs;
-  return [
-    `Contact the operator at ${email}. You can also use Report in a room to flag abuse on this instance.`,
-  ];
-}
-
 export function LegalPage({ doc }: { doc: LegalDoc }) {
+  const operatorEmail = getOperatorContactEmail();
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col px-5 pb-10 pt-6 sm:px-8">
       <header className="flex items-center justify-between gap-4">
@@ -48,11 +41,28 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
               <h2 className="font-display text-2xl italic text-ink">
                 {section.heading}
               </h2>
-              {sectionBody(section.heading, section.body).map((paragraph) => (
-                <p key={paragraph} className="mt-3 text-[15px] leading-7 text-muted">
-                  {paragraph}
+              {section.heading === "Contact" ? (
+                <p className="mt-3 text-[15px] leading-7 text-muted">
+                  Email{" "}
+                  <a
+                    href={`mailto:${operatorEmail}`}
+                    className="text-glare underline-offset-4 hover:underline"
+                  >
+                    {operatorEmail}
+                  </a>{" "}
+                  about this page. You can also use Report in a room to flag abuse
+                  on this instance.
                 </p>
-              ))}
+              ) : (
+                section.body.map((paragraph) => (
+                  <p
+                    key={paragraph}
+                    className="mt-3 text-[15px] leading-7 text-muted"
+                  >
+                    {paragraph}
+                  </p>
+                ))
+              )}
             </section>
           ))}
         </div>

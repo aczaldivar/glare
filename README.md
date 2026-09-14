@@ -58,21 +58,14 @@ See `.env.example`.
 | --- | --- | --- |
 | `ABLY_API_KEY` | Production (Vercel) | Ably app API key with publish, subscribe, and presence |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical URL for metadata and share previews. Local: `http://localhost:3000`. Live: `https://glareroom.vercel.app` |
-| `OPERATOR_CONTACT_EMAIL` | Optional placeholder | Operator inbox shown in the footer and Privacy Contact section. Leave empty until you have a real address. Do not invent one in the repo. |
-| `NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL` | Optional | Same as above if you want to set the public value explicitly. If omitted, `OPERATOR_CONTACT_EMAIL` is copied into the client bundle at build time. |
+| `OPERATOR_CONTACT_EMAIL` | Optional | Operator inbox. Defaults to `contact@glare.com` (also hardcoded in legal copy and the footer). Override only if the inbox changes. |
+| `NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL` | Optional | Same as above if you want to set the public value explicitly. If omitted, `OPERATOR_CONTACT_EMAIL` (or the `contact@glare.com` default) is copied into the client bundle at build time. |
 
-### Operator contact (Anna, before launch)
+### Operator contact
 
-The repo does not include a real support address. `OPERATOR_CONTACT_EMAIL` stays blank on purpose.
+Legal pages, the site footer, and support copy use **contact@glare.com**.
 
-Before a public launch, Anna should:
-
-1. Choose the real operator inbox (whatever address will actually be read).
-2. In Vercel: **Project → Settings → Environment Variables**, add `OPERATOR_CONTACT_EMAIL` for Production (and Preview if you want it on preview URLs).
-3. Optionally put the same value in `.env.local` to check the footer and Privacy Contact section locally.
-4. Redeploy. The footer and Privacy page then show that address.
-
-Until that variable is set, the UI tells operators to set `OPERATOR_CONTACT_EMAIL`. In-room **Report** still works.
+`OPERATOR_CONTACT_EMAIL` defaults to that address. Set it in Vercel only if you need to override it, then redeploy.
 
 The app chooses a realtime provider automatically:
 
@@ -98,14 +91,14 @@ You do **not** put the root key in the browser. The app mints short-lived tokens
 5. Add environment variables (Production, Preview, and Development):
    - `ABLY_API_KEY` = your Ably key
    - `NEXT_PUBLIC_SITE_URL` = `https://glareroom.vercel.app` (or the URL you actually get)
-   - `OPERATOR_CONTACT_EMAIL` = a real inbox when you have one (leave unset until then)
+   - `OPERATOR_CONTACT_EMAIL` = `contact@glare.com` (app default; override only if the inbox changes)
 6. **Claim the public URL**
    - Open the project → **Settings → Domains**
    - If the project is named `glareroom`, `glareroom.vercel.app` is assigned automatically
    - If it is not, click **Add Domain** and enter `glareroom.vercel.app`
    - If that name is already taken on Vercel, add the closest available name (`glare-room.vercel.app`, `glareroom-app.vercel.app`, or a custom domain) and set `NEXT_PUBLIC_SITE_URL` to match
 7. Deploy. Vercel builds on every push to the production branch.
-8. **Review legal copy** before you feature the URL publicly. `/guidelines`, `/terms`, and `/privacy` are product drafts, not lawyer-reviewed documents. Replace or edit them, set `OPERATOR_CONTACT_EMAIL` when you have an inbox, and bump `LEGAL_ACK_VERSION` in `src/lib/legal.ts` if the agreement materially changes (that re-prompts people before they enter a room).
+8. **Review legal copy** before you feature the URL publicly. `/guidelines`, `/terms`, and `/privacy` are product drafts, not lawyer-reviewed documents. Replace or edit them, and bump `LEGAL_ACK_VERSION` in `src/lib/legal.ts` if the agreement materially changes (that re-prompts people before they enter a room). Operator contact is **contact@glare.com**.
 9. Smoke-test: open the site → confirm the 13+ notice → agree to Guidelines/Terms → **Open lobby** (or create a room) → send a message in two browser windows → **Share link** → **Mute** / **Block** / **Report** on a message.
 
 Redeploy after changing env vars so `NEXT_PUBLIC_SITE_URL` and the operator email are baked into the client bundle.
@@ -142,7 +135,7 @@ A scheduled deletion job against durable storage is **out of scope for v1**. Whe
 
 The Terms of Service, Privacy Policy, and Community Guidelines in this repo are **plain-language product drafts** written so Anna can ship a public URL with a visible safety layer. They are **not formal legal advice** and have not been reviewed by an attorney.
 
-Before a public launch, review and revise `/terms`, `/privacy`, and `/guidelines`, confirm they match how you actually host and log data, and set `OPERATOR_CONTACT_EMAIL` if you have an inbox. Changing the acknowledgment version in `src/lib/legal.ts` will ask returning visitors to agree again.
+Before a public launch, review and revise `/terms`, `/privacy`, and `/guidelines`, and confirm they match how you actually host and log data. Operator contact is **contact@glare.com**. Changing the acknowledgment version in `src/lib/legal.ts` will ask returning visitors to agree again.
 
 ## Project layout
 

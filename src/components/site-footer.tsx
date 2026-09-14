@@ -26,19 +26,15 @@ export function SiteFooter({ compact = false }: { compact?: boolean }) {
         {!compact ? (
           <p>Rooms are public. Messages are ephemeral. Be decent.</p>
         ) : null}
-        {operatorEmail ? (
-          <p>
-            Contact{" "}
-            <a
-              href={`mailto:${operatorEmail}`}
-              className="text-glare/80 underline-offset-4 hover:text-glare-hot hover:underline"
-            >
-              {operatorEmail}
-            </a>
-          </p>
-        ) : (
-          <p>Operator contact: set OPERATOR_CONTACT_EMAIL.</p>
-        )}
+        <p>
+          Contact{" "}
+          <a
+            href={`mailto:${operatorEmail}`}
+            className="text-glare/80 underline-offset-4 hover:text-glare-hot hover:underline"
+          >
+            {operatorEmail}
+          </a>
+        </p>
       </div>
       <nav className="flex flex-wrap gap-x-4 gap-y-1">
         {LINKS.map((link) => (

@@ -79,8 +79,14 @@ export const GUIDELINES: LegalDoc = {
     {
       heading: "If something is wrong",
       body: [
-        "Use Report on a message or person. That logs a report for the operator. Mute or block someone locally in your browser if you do not want to see them.",
+        "Use Report on a message or person, or email contact@glare.com. That logs a report for the operator. Mute or block someone locally in your browser if you do not want to see them.",
         "Reporting is not a substitute for contacting law enforcement if someone is in immediate danger.",
+      ],
+    },
+    {
+      heading: "Contact",
+      body: [
+        "Email contact@glare.com about these guidelines. You can also use Report in a room to flag abuse on this instance.",
       ],
     },
   ],
@@ -140,6 +146,12 @@ export const TERMS: LegalDoc = {
       body: [
         "We may update these terms as the product changes. If we make a material change, we may ask you to acknowledge the new version before entering a room again.",
         "If a court finds a part of these terms unenforceable, the rest still applies.",
+      ],
+    },
+    {
+      heading: "Contact",
+      body: [
+        "Email contact@glare.com about these terms. You can also use Report in a room to flag abuse on this instance.",
       ],
     },
   ],
@@ -214,7 +226,7 @@ export const PRIVACY: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        "Set OPERATOR_CONTACT_EMAIL (or NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL) to publish an operator inbox. Until that is set, use Report in a room to flag abuse on this instance.",
+        "Email contact@glare.com about this policy, privacy questions, or legal requests. You can also use Report in a room to flag abuse on this instance.",
       ],
     },
   ],
