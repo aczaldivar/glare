@@ -16,8 +16,13 @@ export type PresenceMember = {
 
 export type RealtimeProvider = "ably" | "local" | "unconfigured";
 
+export type BotGuardMode = "off" | "turnstile" | "missing";
+
 export type RealtimeConfig = {
   provider: RealtimeProvider;
+  botGuard: BotGuardMode;
+  verified: boolean;
+  turnstileSiteKey: string | null;
 };
 
 export type BusEvent =

@@ -1,5 +1,10 @@
 import { NextRequest } from "next/server";
 import {
+  evaluateEntryGuard,
+  humanSessionCookieHeader,
+} from "@/lib/bot-guard";
+import {
+  HUMAN_SESSION_TTL_MS,
   TOKEN_RATE_LIMIT_MAX,
   TOKEN_RATE_LIMIT_WINDOW_MS,
 } from "@/lib/constants";
@@ -26,6 +31,14 @@ export async function GET(request: NextRequest) {
           "Cache-Control": "no-store",
         },
       },
+    );
+  }
+
+  const entry = evaluateEntryGuard(request);
+  if (!entry.ok) {
+    return Response.json(
+      { error: entry.error },
+      { status: entry.status, headers: { "Cache-Control": "no-store" } },
     );
   }
 
@@ -57,7 +70,12 @@ export async function GET(request: NextRequest) {
     ablyClientTokenParams(room, clientId),
   );
 
-  return Response.json(tokenRequest, {
-    headers: { "Cache-Control": "no-store" },
-  });
+  const headers: Record<string, string> = { "Cache-Control": "no-store" };
+  if (entry.refreshToken) {
+    headers["Set-Cookie"] = humanSessionCookieHeader(entry.refreshToken, {
+      maxAgeMs: HUMAN_SESSION_TTL_MS,
+    });
+  }
+
+  return Response.json(tokenRequest, { headers });
 }

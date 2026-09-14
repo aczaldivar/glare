@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { DeployNotReady } from "@/components/deploy-not-ready";
 import { EmbeddedChat } from "@/components/embedded-chat";
 import {
   EpisodePlayer,
@@ -15,6 +16,7 @@ import { TranscriptPanel } from "@/components/transcript-panel";
 import { useIdentity } from "@/hooks/use-identity";
 import { useLegalAck } from "@/hooks/use-legal-ack";
 import { usePodcastTab } from "@/hooks/use-podcast-tab";
+import { useRealtimeConfig } from "@/hooks/use-realtime-config";
 import { useRoomChannel } from "@/hooks/use-room-channel";
 import type { PodcastEpisode, TranscriptCue } from "@/lib/podcast/types";
 import { SAFETY_BANNER } from "@/lib/legal";
@@ -27,8 +29,9 @@ const ETHICS_SOFT_NUDGES = [
 
 export function PodcastRoomView({ episode }: { episode: PodcastEpisode }) {
   const legal = useLegalAck();
+  const config = useRealtimeConfig();
 
-  if (!legal.ready) {
+  if (!legal.ready || !config.ready) {
     return (
       <div className="flex min-h-dvh items-center justify-center text-muted">
         Warming the room…
@@ -36,8 +39,25 @@ export function PodcastRoomView({ episode }: { episode: PodcastEpisode }) {
     );
   }
 
-  if (!legal.acknowledged) {
-    return <RoomGate room={episode.roomSlug} onAccept={legal.acknowledge} />;
+  if (config.provider === "unconfigured" || config.botGuard === "missing") {
+    return <DeployNotReady provider={config.provider} botGuard={config.botGuard} />;
+  }
+
+  const needsLegal = !legal.acknowledged;
+  const needsHuman = config.botGuard === "turnstile" && !config.verified;
+  if (needsLegal || needsHuman) {
+    return (
+      <RoomGate
+        room={episode.roomSlug}
+        needsLegal={needsLegal}
+        needsHuman={needsHuman}
+        turnstileSiteKey={config.turnstileSiteKey}
+        onAccept={() => {
+          if (needsLegal) legal.acknowledge();
+          if (needsHuman) config.markVerified();
+        }}
+      />
+    );
   }
 
   return <PodcastRoomLive episode={episode} />;

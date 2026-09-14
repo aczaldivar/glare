@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
+import { DeployNotReady } from "@/components/deploy-not-ready";
 import { EmbeddedChat } from "@/components/embedded-chat";
 import { GlareMark } from "@/components/glare-mark";
 import { NameChip } from "@/components/name-chip";
@@ -11,6 +12,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { useIdentity } from "@/hooks/use-identity";
 import { useLegalAck } from "@/hooks/use-legal-ack";
 import { useLocalModeration } from "@/hooks/use-local-moderation";
+import { useRealtimeConfig } from "@/hooks/use-realtime-config";
 import { useRoomChannel, type ConnectionState } from "@/hooks/use-room-channel";
 import { colorFromId, initialsFromName, type Identity } from "@/lib/identity";
 import { SAFETY_BANNER } from "@/lib/legal";
@@ -26,8 +28,9 @@ function connectionLabel(state: ConnectionState) {
 
 export function RoomView({ room }: { room: string }) {
   const legal = useLegalAck();
+  const config = useRealtimeConfig();
 
-  if (!legal.ready) {
+  if (!legal.ready || !config.ready) {
     return (
       <div className="flex min-h-dvh items-center justify-center text-muted">
         Warming the room…
@@ -35,8 +38,25 @@ export function RoomView({ room }: { room: string }) {
     );
   }
 
-  if (!legal.acknowledged) {
-    return <RoomGate room={room} onAccept={legal.acknowledge} />;
+  if (config.provider === "unconfigured" || config.botGuard === "missing") {
+    return <DeployNotReady provider={config.provider} botGuard={config.botGuard} />;
+  }
+
+  const needsLegal = !legal.acknowledged;
+  const needsHuman = config.botGuard === "turnstile" && !config.verified;
+  if (needsLegal || needsHuman) {
+    return (
+      <RoomGate
+        room={room}
+        needsLegal={needsLegal}
+        needsHuman={needsHuman}
+        turnstileSiteKey={config.turnstileSiteKey}
+        onAccept={() => {
+          if (needsLegal) legal.acknowledge();
+          if (needsHuman) config.markVerified();
+        }}
+      />
+    );
   }
 
   return <RoomLive room={room} />;

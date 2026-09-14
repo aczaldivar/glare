@@ -15,7 +15,7 @@ Walk in → name or join a room → talk live → share the room link.
 - **Real-time messages** and **presence** (who is in the room)
 - Shareable room URLs and Open Graph previews
 - Mobile-friendly, product-ready UI
-- Safety basics: 13+ notice (not age verification), Community Guidelines / Terms acknowledgment before entering a room, 500-character messages, burst rate limits, plain-text only, in-app report stub, mute/block in this browser
+- Safety basics: 13+ notice (not age verification), Community Guidelines / Terms acknowledgment before entering a room, 500-character messages, burst rate limits, Cloudflare Turnstile when configured, a honeypot on entry forms, plain-text only, in-app report stub, mute/block in this browser
 - In-app **Terms of Service**, **Privacy**, and **Community Guidelines** (plain-language product drafts)
 - Footer links to those pages; no analytics or advertising cookies in v1
 - **Podcast rooms:** operator-curated episode + transcript + live chat at `/r/lobby-ep1`. Official embeds or rights-clear in-repo audio only; no user media uploads. Chat is UGC under the Guidelines.
@@ -28,6 +28,7 @@ Featured room to share: `/r/lobby`. Demo podcast room: `/r/lobby-ep1`.
 - Deploys as a standard Vercel project (no custom long-lived server)
 - **Production realtime:** [Ably](https://ably.com) (token auth from a Next.js route; clients subscribe only)
 - **Local realtime:** in-process event bus + Server-Sent Events, so `npm run dev` works with no keys
+- **Bot friction:** [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) when configured; honeypot + same-origin write checks always
 
 Messages are ephemeral. Locally they live in memory. In production Ably can rewind recent messages for people who just joined; they are not stored in a database.
 
@@ -63,6 +64,8 @@ See `.env.example`.
 | `NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL` | Optional | Same as above if you want to set the public value explicitly. If omitted, `OPERATOR_CONTACT_EMAIL` (or the `contact@glare.com` default) is copied into the client bundle at build time. |
 | `UPSTASH_REDIS_REST_URL` | Recommended on Vercel | Shared rate-limit store. Without it, limits are in-memory per serverless isolate. |
 | `UPSTASH_REDIS_REST_TOKEN` | With the URL above | Upstash REST token for the shared limiter. |
+| `TURNSTILE_SECRET_KEY` | Recommended on Vercel | Cloudflare Turnstile secret. Required (with the site key) before real traffic. Missing on Vercel fails closed. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | With the secret above | Cloudflare Turnstile site key for the entry widget. |
 
 ### Operator contact
 
@@ -76,6 +79,14 @@ The app chooses a realtime provider automatically:
 2. Running on Vercel without that key → rooms show a configuration message (serverless instances cannot share the local bus)
 3. Otherwise → local SSE bus
 
+Turnstile follows the same least-footgun pattern:
+
+1. Both Turnstile keys set → entry widget + signed httpOnly session required to mint an Ably token and `POST` messages
+2. Running on Vercel without both keys → rooms show a configuration message; token minting and chat writes return 501 (not silently open)
+3. Otherwise (local/dev) → skip the widget, same as running without Ably
+
+Set **Upstash + Turnstile** before inviting real traffic. Anonymous public chat cannot make bots impossible; these controls raise the cost.
+
 ## Set up Ably (production)
 
 1. Create a free account at [ably.com](https://ably.com)
@@ -83,20 +94,40 @@ The app chooses a realtime provider automatically:
 3. Open **API Keys** and copy a key that can publish, subscribe, and be present
 4. Put it in `.env.local` for a local Ably test, and in Vercel env vars for production
 
-You do **not** put the root key in the browser. The app mints short-lived tokens (~10 minutes) from `/api/realtime/token`, scoped to **one** room channel (`glare:room:{room}`) with subscribe + presence only. Clients cannot publish. Only the server publishes chat messages (after validation and rate limiting). Token minting is rate-limited per IP.
+You do **not** put the root key in the browser. The app mints short-lived tokens (~10 minutes) from `/api/realtime/token`, scoped to **one** room channel (`glare:room:{room}`) with subscribe + presence only. Clients cannot publish. Only the server publishes chat messages (after validation and rate limiting). Token minting is rate-limited per IP. When Turnstile is configured, that GET still works for the Ably Realtime client (`authUrl`); it requires the httpOnly session cookie from `/api/realtime/verify`, not a Turnstile token on the query string.
+
+## Set up Cloudflare Turnstile (recommended before real traffic)
+
+1. Create a free account at [Cloudflare](https://dash.cloudflare.com) if you do not have one
+2. Open **Turnstile** and add a widget for your site (hostname `localhost` for local tests, plus your Vercel host)
+3. Copy the **site key** and **secret key**
+4. Put them in `.env.local` as `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`, and in Vercel env vars for production/preview
+5. Redeploy so the public site key is in the client bundle
+
+When those keys are set:
+
+- Join and room-entry forms show the widget and a honeypot field
+- `POST /api/realtime/verify` checks the Turnstile token (and rejects a filled honeypot), then sets a short-lived httpOnly `glare_human` cookie
+- `GET /api/realtime/token` and `POST /api/realtime/messages` require that cookie
+
+When the keys are **not** set locally, `npm run dev` still works. On Vercel, missing keys fail closed instead of leaving chat open.
 
 ## Rate limits
 
-Message send: 8 / 10 seconds per IP and room, plus a short minimum interval. Ably token minting: 12 / 60 seconds per IP.
+Message send: 8 / 10 seconds per IP and room, plus a short minimum interval. Ably token minting: 12 / 60 seconds per IP. Human-check (`/api/realtime/verify`): 10 / 10 minutes per IP.
 
 **Vercel caveat:** the default limiter is an in-memory map on the Node process. Serverless isolates do not share that map, so a client can get a fresh budget on a cold instance. That is enough for local `next dev` / `next start`, not a strong production control.
 
-For a shared limit, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (Upstash Redis REST). When those are set, token, message, and report limits go through Redis and fail closed if Redis errors.
+For a shared limit, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (Upstash Redis REST). When those are set, token, message, report, and verify limits go through Redis and fail closed if Redis errors.
 
 ## Security notes
 
 - `ABLY_API_KEY` is server-only. Browser clients receive a token for **one** room (`glare:room:{room}`), 10-minute TTL, subscribe + presence, no publish.
-- Responses include `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` disabling camera/mic/geo, and a Content-Security-Policy that allows this origin plus Ably.
+- Chat writes go through `POST /api/realtime/messages` (length cap, rate limit). The Ably token cannot publish.
+- Entry forms include a honeypot field. Same-origin `Origin`/`Referer` (and `Sec-Fetch-Site` when present) is required on browser POSTs. That check is **not** applied to Ably token GETs.
+- When Turnstile keys are set, token minting and message POSTs also require the signed httpOnly human session cookie.
+- Responses include `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` disabling camera/mic/geo, and a Content-Security-Policy that allows this origin, Ably, and Cloudflare Turnstile (`challenges.cloudflare.com`). `frame-ancestors` stays `'none'`.
+- Determined bots can still show up in anonymous public chat. These controls raise the cost; they do not make automation impossible.
 
 ## Deploy to Vercel and claim glareroom.vercel.app
 
@@ -109,6 +140,7 @@ For a shared limit, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` 
    - `NEXT_PUBLIC_SITE_URL` = `https://glareroom.vercel.app` (or the URL you actually get)
    - `OPERATOR_CONTACT_EMAIL` = `contact@glare.com` (app default; override only if the inbox changes)
    - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` = recommended so rate limits are shared across serverless instances
+   - `TURNSTILE_SECRET_KEY` / `NEXT_PUBLIC_TURNSTILE_SITE_KEY` = recommended before real traffic; without both, this Vercel deploy fails closed for tokens and chat writes
 6. **Claim the public URL**
    - Open the project → **Settings → Domains**
    - If the project is named `glareroom`, `glareroom.vercel.app` is assigned automatically
@@ -132,8 +164,9 @@ In **Settings → Domains**, add something like `glareroom.com`, follow DNS inst
 - **Mute / block:** available in the room. Mute hides that person on this browser; Block is the same local list from the people panel. It does not ban them for anyone else.
 - **Report:** in-app stub. Reports are stored in server memory (and logged) so an operator can see them; they are not a full moderation console.
 - Rate limit: 8 messages / 10 seconds per IP and room, plus a short minimum interval. Token minting is also limited per IP. In-memory limits are weak on Vercel unless Upstash is configured (see Rate limits).
+- Turnstile + Upstash are the recommended production pair before featuring the URL. Without Turnstile keys, a Vercel deploy will not mint chat tokens.
 - Do not treat this as a private messenger.
-- **No analytics or advertising cookies in v1.** Guest state uses `localStorage` (identity, legal acknowledgment, mute/block), not a tracking cookie.
+- **No analytics or advertising cookies in v1.** Guest state uses `localStorage` (identity, legal acknowledgment, mute/block). When Turnstile is on, a short-lived httpOnly session cookie is set after the human check.
 
 ## Message retention (~30 days)
 
@@ -188,7 +221,7 @@ Formal lawyer review is still recommended for **liability**, a **DMCA process if
 ```
 src/app/                Landing, legal pages, room routes, metadata, API
 src/app/r/[room]        Shareable room URLs
-src/app/api/realtime    Config, Ably tokens, messages, local SSE/presence
+src/app/api/realtime    Config, Ably tokens, human-check, messages, local SSE/presence
 src/app/api/reports     Abuse report intake
 src/components          Landing, room, legal, safety UI
 src/hooks               Identity, realtime, legal ack, local mute/block

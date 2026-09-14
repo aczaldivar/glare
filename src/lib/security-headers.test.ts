@@ -19,3 +19,12 @@ test("CSP allows Ably websocket/rest hosts and same-origin app traffic", () => {
   assert.match(csp, /https:\/\/\*\.ably-realtime\.com/);
   assert.match(csp, /default-src 'self'/);
 });
+
+test("CSP allows Turnstile script, frame, and connect hosts without weakening frame-ancestors", () => {
+  const csp = contentSecurityPolicy();
+  assert.match(csp, /script-src[^;]*https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-src 'self' https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /connect-src[^;]*https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-ancestors 'none'/);
+  assert.doesNotMatch(csp, /frame-ancestors[^;]*challenges\.cloudflare\.com/);
+});

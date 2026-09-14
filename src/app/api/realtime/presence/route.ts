@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { rejectNonBrowserWrite } from "@/lib/bot-guard";
 import { colorFromId, validateDisplayName } from "@/lib/identity";
 import { isUuid } from "@/lib/messages";
 import {
@@ -12,6 +13,9 @@ import { isValidRoomSlug, slugifyRoom } from "@/lib/rooms";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const blocked = rejectNonBrowserWrite(request);
+  if (blocked) return blocked;
+
   if (getRealtimeProvider() !== "local") {
     return Response.json(
       { error: "Local presence is only available in single-process mode." },

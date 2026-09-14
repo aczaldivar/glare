@@ -131,7 +131,7 @@ export const TERMS: LegalDoc = {
       heading: "Moderation and removal",
       body: [
         "We may refuse, rate-limit, hide, or remove messages, names, or rooms. We may block access when we believe these terms or the law require it.",
-        "We do not have to give advance notice, and we are not obligated to restore a room. Automated limits (length and send rate) are part of this.",
+        "We do not have to give advance notice, and we are not obligated to restore a room. Automated limits (length, send rate, and a human check when configured) are part of this.",
       ],
     },
     {
@@ -201,7 +201,7 @@ export const PRIVACY: LegalDoc = {
     {
       heading: "Processors",
       body: [
-        "The site may be hosted on Vercel. Realtime delivery in production uses Ably. Those providers process data according to their own terms in order to host and transmit the service.",
+        "The site may be hosted on Vercel. Realtime delivery in production uses Ably. When configured, Cloudflare Turnstile is used as a human check before chat tokens are minted. Those providers process data according to their own terms in order to host, transmit, or protect the service.",
         "We do not sell your personal information. v1 does not use analytics SDKs, advertising cookies, or tracking pixels.",
       ],
     },
@@ -209,13 +209,14 @@ export const PRIVACY: LegalDoc = {
       heading: "Cookies and analytics",
       body: [
         "v1 does not set advertising or analytics cookies. Guest state uses localStorage (identity, legal acknowledgment, mute/block), not a tracking cookie.",
+        "When Turnstile is configured, the app sets a short-lived httpOnly cookie after a successful human check so you can receive a chat token and send messages. It is not an advertising or analytics cookie.",
         "The host or browser may still use cookies that are strictly needed to run or protect the site itself.",
       ],
     },
     {
       heading: "Why we use this information",
       body: [
-        "To operate public chat: deliver messages, show who is in a room, enforce length and rate limits, and keep basic safety tools working.",
+        "To operate public chat: deliver messages, show who is in a room, enforce length and rate limits, run a human check when configured, and keep basic safety tools working.",
         "To review reports and respond to abuse or legal requests when we have a good-faith reason to do so.",
       ],
     },
