@@ -30,6 +30,7 @@ export function EmbeddedChat({
   emptyHint = "Public room. Be decent with the people who walk in.",
   placeholder = "Write to the room",
   helperText = "500-character cap · rate limited · report harm when you see it.",
+  softNudges = [],
   onShare,
   copied = false,
 }: {
@@ -45,6 +46,8 @@ export function EmbeddedChat({
   emptyHint?: string;
   placeholder?: string;
   helperText?: string;
+  /** Ethics soft pack: light copy only, never a filter. */
+  softNudges?: string[];
   onShare?: () => void;
   copied?: boolean;
 }) {
@@ -78,14 +81,18 @@ export function EmbeddedChat({
   }, []);
 
   useEffect(() => {
+    if (!quoteSeed || quoteSeed.id === appliedQuoteId) return;
+    /* Pixel: apply quote after click, not during render (hidden Chat skipped the first paint). */
+    /* eslint-disable react-hooks/set-state-in-effect -- quoteSeed is a parent user action */
+    setAppliedQuoteId(quoteSeed.id);
+    setDraft(quoteSeed.text.slice(0, MAX_MESSAGE_LENGTH));
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [quoteSeed, appliedQuoteId]);
+
+  useEffect(() => {
     if (appliedQuoteId == null) return;
     inputRef.current?.focus();
   }, [appliedQuoteId]);
-
-  if (quoteSeed && quoteSeed.id !== appliedQuoteId) {
-    setAppliedQuoteId(quoteSeed.id);
-    setDraft(quoteSeed.text.slice(0, MAX_MESSAGE_LENGTH));
-  }
 
   async function onSend(event: FormEvent) {
     event.preventDefault();
@@ -122,6 +129,13 @@ export function EmbeddedChat({
             {emptyHint ? (
               <p className="mt-3 max-w-sm text-xs text-muted">{emptyHint}</p>
             ) : null}
+            {softNudges.length > 0 ? (
+              <ul className="mt-3 max-w-sm space-y-1 text-xs text-muted">
+                {softNudges.map((nudge) => (
+                  <li key={nudge}>{nudge}</li>
+                ))}
+              </ul>
+            ) : null}
             {onShare ? (
               <button
                 type="button"
@@ -149,6 +163,12 @@ export function EmbeddedChat({
           ))
         )}
       </div>
+
+      {softNudges.length > 0 && visibleMessages.length > 0 ? (
+        <p className="border-t border-line px-4 py-2 text-[11px] leading-5 text-muted sm:px-5">
+          {softNudges.join(" · ")}
+        </p>
+      ) : null}
 
       <form onSubmit={onSend} className="border-t border-line p-3 sm:p-4">
         <div className="flex items-end gap-2 rounded-2xl border border-line bg-black/25 p-2 focus-within:border-glare/40 focus-within:shadow-[0_0_0_4px_rgba(255,217,160,0.1)]">

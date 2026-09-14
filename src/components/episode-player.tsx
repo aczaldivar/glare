@@ -3,11 +3,18 @@
 import { useEffect, useRef } from "react";
 import type { PodcastEpisode } from "@/lib/podcast/types";
 
+export const PLAYBACK_RATES = [1, 1.25, 1.5] as const;
+export const SKIP_MS = 15_000;
+
 function formatClock(ms: number) {
   const total = Math.max(0, Math.floor(ms / 1000));
   const minutes = Math.floor(total / 60);
   const seconds = total % 60;
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function formatRate(rate: number) {
+  return `${rate}×`;
 }
 
 export function EpisodePlayer({
@@ -16,16 +23,22 @@ export function EpisodePlayer({
   playing,
   compact = false,
   disabled = false,
+  playbackRate = 1,
   onToggle,
   onSeek,
+  onSkip,
+  onCycleRate,
 }: {
   episode: PodcastEpisode;
   currentMs: number;
   playing: boolean;
   compact?: boolean;
   disabled?: boolean;
+  playbackRate?: number;
   onToggle: () => void;
   onSeek: (ms: number) => void;
+  onSkip?: (deltaMs: number) => void;
+  onCycleRate?: () => void;
 }) {
   const barRef = useRef<HTMLInputElement>(null);
 
@@ -81,6 +94,43 @@ export function EpisodePlayer({
           className="h-2 w-full cursor-pointer accent-[#e8a15a] disabled:cursor-not-allowed"
         />
       </label>
+      {onSkip || onCycleRate ? (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {onSkip ? (
+            <>
+              <button
+                type="button"
+                onClick={() => onSkip(-SKIP_MS)}
+                disabled={disabled}
+                className="inline-flex h-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-line px-3 text-xs text-muted disabled:opacity-40"
+                aria-label="Back 15 seconds"
+              >
+                −15
+              </button>
+              <button
+                type="button"
+                onClick={() => onSkip(SKIP_MS)}
+                disabled={disabled}
+                className="inline-flex h-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-line px-3 text-xs text-muted disabled:opacity-40"
+                aria-label="Forward 15 seconds"
+              >
+                +15
+              </button>
+            </>
+          ) : null}
+          {onCycleRate ? (
+            <button
+              type="button"
+              onClick={onCycleRate}
+              disabled={disabled}
+              className="inline-flex h-11 min-h-11 min-w-11 items-center justify-center rounded-full border border-line px-3 text-xs text-muted disabled:opacity-40"
+              aria-label={`Playback speed ${formatRate(playbackRate)}. Click to change.`}
+            >
+              {formatRate(playbackRate)}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       {disabled ? (
         <p className="mt-2 text-xs text-muted">
           Playback is for curated in-repo files. Official embeds are catalog-only

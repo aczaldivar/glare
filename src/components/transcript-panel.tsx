@@ -56,9 +56,9 @@ export function TranscriptPanel({
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
-            Transcript
+            Searchable · English
           </p>
-          <p className="text-sm text-ink">Searchable · English</p>
+          <h2 className="text-sm text-ink">Transcript (same conversation)</h2>
         </div>
         <button
           type="button"
@@ -107,11 +107,13 @@ export function TranscriptPanel({
                   key={cue.id}
                   ref={active ? activeRef : undefined}
                   aria-current={active ? "true" : undefined}
-                  className={`rounded-2xl px-3 py-3 ${
-                    active ? "bg-glare/10" : "bg-transparent"
+                  className={`rounded-r-2xl border-l-4 px-3 py-3 ${
+                    active
+                      ? "border-l-glare bg-glare/10"
+                      : "border-l-transparent bg-transparent"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -122,6 +124,7 @@ export function TranscriptPanel({
                       className="min-w-0 flex-1 text-left"
                     >
                       <p className="font-mono text-[10px] text-muted">
+                        {active ? "Now · " : null}
                         {formatClock(cue.startMs)}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-ink">{cue.text}</p>
@@ -130,7 +133,7 @@ export function TranscriptPanel({
                       type="button"
                       onClick={() => onQuote(cue)}
                       aria-label="Quote this line in chat"
-                      className="mt-1 shrink-0 text-[11px] text-glare underline-offset-4 hover:underline"
+                      className="inline-flex h-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-[11px] text-glare underline-offset-4 hover:underline"
                     >
                       Quote
                     </button>

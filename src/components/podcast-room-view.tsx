@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { EmbeddedChat } from "@/components/embedded-chat";
-import { EpisodePlayer } from "@/components/episode-player";
+import {
+  EpisodePlayer,
+  PLAYBACK_RATES,
+} from "@/components/episode-player";
 import { GlareMark } from "@/components/glare-mark";
 import { NameChip } from "@/components/name-chip";
 import { RoomGate } from "@/components/room-gate";
@@ -11,10 +14,16 @@ import { SiteFooter } from "@/components/site-footer";
 import { TranscriptPanel } from "@/components/transcript-panel";
 import { useIdentity } from "@/hooks/use-identity";
 import { useLegalAck } from "@/hooks/use-legal-ack";
+import { usePodcastTab } from "@/hooks/use-podcast-tab";
 import { useRoomChannel } from "@/hooks/use-room-channel";
 import type { PodcastEpisode, TranscriptCue } from "@/lib/podcast/types";
 import { SAFETY_BANNER } from "@/lib/legal";
 import { curatedFileSrc } from "@/lib/podcast/catalog";
+
+const ETHICS_SOFT_NUDGES = [
+  "If you’re ahead, mark spoilers.",
+  "Disagree with the idea, not the person.",
+];
 
 export function PodcastRoomView({ episode }: { episode: PodcastEpisode }) {
   const legal = useLegalAck();
@@ -47,7 +56,8 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
   const [copied, setCopied] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
-  const [mobileTab, setMobileTab] = useState<"transcript" | "chat">("transcript");
+  const [mobileTab, selectMobileTab] = usePodcastTab(episode.roomSlug);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const fileSrc = curatedFileSrc(episode);
 
   useEffect(() => {
@@ -68,6 +78,10 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
     };
   }, [fileSrc]);
 
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.playbackRate = playbackRate;
+  }, [playbackRate, fileSrc]);
+
   function onToggle() {
     const audio = audioRef.current;
     if (!audio) return;
@@ -78,13 +92,29 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
   function onSeek(ms: number) {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.currentTime = ms / 1000;
-    setCurrentMs(ms);
+    const next = Math.min(Math.max(0, ms), episode.durationMs);
+    audio.currentTime = next / 1000;
+    setCurrentMs(next);
+  }
+
+  function onSkip(deltaMs: number) {
+    onSeek(currentMs + deltaMs);
+  }
+
+  function onCycleRate() {
+    const audio = audioRef.current;
+    const current = audio?.playbackRate ?? playbackRate;
+    const index = PLAYBACK_RATES.indexOf(
+      current as (typeof PLAYBACK_RATES)[number],
+    );
+    const next = PLAYBACK_RATES[(index + 1) % PLAYBACK_RATES.length];
+    if (audio) audio.playbackRate = next;
+    setPlaybackRate(next);
   }
 
   function onQuote(cue: TranscriptCue) {
     setQuoteSeed({ id: Date.now(), text: `“${cue.text}”` });
-    setMobileTab("chat");
+    selectMobileTab("chat");
   }
 
   async function shareRoom() {
@@ -131,11 +161,12 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       notice={channel.notice}
       send={channel.send}
       quoteSeed={quoteSeed}
-      emptyTitle="Talk about the episode."
+      emptyTitle="Read, listen, or both"
       emptyBody="Quote a transcript line if you are citing it. Anyone with the link can walk in."
       emptyHint="Public room. Be decent with the people who walk in."
       placeholder="Quote a line, then add your take"
       helperText="Quote the transcript to cite a line. Public room — be decent."
+      softNudges={ETHICS_SOFT_NUDGES}
       onShare={shareRoom}
       copied={copied}
     />
@@ -215,8 +246,11 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           playing={playing}
           compact
           disabled={!fileSrc}
+          playbackRate={playbackRate}
           onToggle={onToggle}
           onSeek={onSeek}
+          onSkip={onSkip}
+          onCycleRate={onCycleRate}
         />
       </div>
       <div className="sticky top-2 z-10 mb-4 hidden lg:block">
@@ -225,8 +259,11 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           currentMs={currentMs}
           playing={playing}
           disabled={!fileSrc}
+          playbackRate={playbackRate}
           onToggle={onToggle}
           onSeek={onSeek}
+          onSkip={onSkip}
+          onCycleRate={onCycleRate}
         />
       </div>
 
@@ -241,7 +278,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           id="podcast-tab-transcript"
           aria-controls="podcast-panel-transcript"
           aria-selected={mobileTab === "transcript"}
-          onClick={() => setMobileTab("transcript")}
+          onClick={() => selectMobileTab("transcript")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "transcript"
               ? "border-glare/50 text-ink"
@@ -256,7 +293,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           id="podcast-tab-chat"
           aria-controls="podcast-panel-chat"
           aria-selected={mobileTab === "chat"}
-          onClick={() => setMobileTab("chat")}
+          onClick={() => selectMobileTab("chat")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "chat"
               ? "border-glare/50 text-ink"
@@ -267,7 +304,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
         </button>
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-4 pb-4 lg:grid-cols-2">
+      <div className="grid min-h-0 flex-1 gap-4 pb-4 lg:grid-cols-[1.2fr_1fr]">
         <div
           id="podcast-panel-transcript"
           role="tabpanel"
