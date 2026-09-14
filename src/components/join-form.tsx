@@ -40,7 +40,7 @@ export function JoinForm() {
           autoComplete="off"
           autoCapitalize="none"
           spellCheck={false}
-          className="h-14 flex-1 rounded-2xl border border-line bg-black/30 px-4 text-lg text-ink outline-none transition focus:border-glare/50 focus:shadow-[0_0_0_4px_rgba(255,217,160,0.12)]"
+          className="h-14 flex-1 rounded-2xl border border-line bg-black/30 px-4 text-lg text-ink outline-none transition placeholder:text-muted/70 focus:border-glare/50 focus:shadow-[0_0_0_4px_rgba(255,217,160,0.12)]"
         />
         <button
           type="submit"

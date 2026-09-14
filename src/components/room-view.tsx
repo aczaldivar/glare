@@ -252,7 +252,7 @@ export function RoomView({ room }: { room: string }) {
               <button
                 type="submit"
                 disabled={!normalizeMessageText(draft) || channel.connection === "offline"}
-                className="h-11 rounded-xl bg-glare px-4 text-sm font-semibold text-[#2a1c0a] transition hover:bg-glare-hot disabled:cursor-not-allowed disabled:opacity-40"
+                className="h-11 shrink-0 whitespace-nowrap rounded-xl bg-glare px-5 text-sm font-semibold text-[#2a1c0a] transition hover:bg-glare-hot disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Send
               </button>
