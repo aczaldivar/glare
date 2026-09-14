@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { EmbeddedChat } from "@/components/embedded-chat";
 import {
   EpisodePlayer,
@@ -115,6 +115,18 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
   function onQuote(cue: TranscriptCue) {
     setQuoteSeed({ id: Date.now(), text: `“${cue.text}”` });
     selectMobileTab("chat");
+  }
+
+  function onMobileTabKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+    event.preventDefault();
+    const next = mobileTab === "transcript" ? "chat" : "transcript";
+    selectMobileTab(next);
+    const id =
+      next === "chat" ? "podcast-tab-chat" : "podcast-tab-transcript";
+    window.requestAnimationFrame(() => {
+      document.getElementById(id)?.focus();
+    });
   }
 
   async function shareRoom() {
@@ -271,6 +283,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
         className="mb-3 flex gap-2 lg:hidden"
         role="tablist"
         aria-label="Episode views"
+        onKeyDown={onMobileTabKeyDown}
       >
         <button
           type="button"
@@ -278,6 +291,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           id="podcast-tab-transcript"
           aria-controls="podcast-panel-transcript"
           aria-selected={mobileTab === "transcript"}
+          tabIndex={mobileTab === "transcript" ? 0 : -1}
           onClick={() => selectMobileTab("transcript")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "transcript"
@@ -293,6 +307,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           id="podcast-tab-chat"
           aria-controls="podcast-panel-chat"
           aria-selected={mobileTab === "chat"}
+          tabIndex={mobileTab === "chat" ? 0 : -1}
           onClick={() => selectMobileTab("chat")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "chat"

@@ -73,13 +73,14 @@ export function TranscriptPanel({
         </button>
       </div>
       <div className="border-b border-line px-4 py-3">
-        <label className="block">
+        <label htmlFor="transcript-search" className="block">
           <span className="sr-only">Search transcript</span>
           <input
+            id="transcript-search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search the transcript"
-            className="h-11 w-full rounded-2xl border border-line bg-black/30 px-3 text-sm text-ink outline-none placeholder:text-muted focus:border-glare/50"
+            className="h-11 w-full rounded-2xl border border-line bg-black/30 px-3 text-sm text-ink placeholder:text-muted focus:border-glare/50"
           />
         </label>
       </div>

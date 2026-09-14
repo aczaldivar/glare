@@ -74,7 +74,7 @@ export function SafetyActions({
       <button
         type="button"
         onClick={onUnblock}
-        className="text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
+        className="inline-flex min-h-11 min-w-11 items-center text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
       >
         Unmute / Unblock
       </button>
@@ -87,7 +87,9 @@ export function SafetyActions({
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
+          aria-expanded={open}
+          aria-controls="report-form"
+          className="inline-flex min-h-11 min-w-11 items-center text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
         >
           {status === "done" ? "Reported" : "Report"}
         </button>
@@ -95,7 +97,7 @@ export function SafetyActions({
           <button
             type="button"
             onClick={onHideMessage}
-            className="text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
+            className="inline-flex min-h-11 min-w-11 items-center text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
           >
             Hide
           </button>
@@ -103,23 +105,28 @@ export function SafetyActions({
         <button
           type="button"
           onClick={onBlock}
-          className="text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
+          className="inline-flex min-h-11 min-w-11 items-center text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
         >
           {onHideMessage ? "Mute" : "Block"}
         </button>
       </div>
       {open && status !== "done" ? (
         <form
+          id="report-form"
           onSubmit={onReport}
           className="panel absolute z-10 mt-2 w-56 rounded-2xl p-3"
         >
-          <label className="block text-[11px] uppercase tracking-[0.16em] text-muted">
+          <label
+            htmlFor="report-reason"
+            className="block text-[11px] uppercase tracking-[0.16em] text-muted"
+          >
             Why?
           </label>
           <select
+            id="report-reason"
             value={reason}
             onChange={(event) => setReason(event.target.value as ReportReason)}
-            className="mt-2 w-full rounded-xl border border-line bg-black/40 px-2 py-2 text-xs text-ink outline-none"
+            className="mt-2 min-h-11 w-full rounded-xl border border-line bg-black/40 px-2 py-2 text-xs text-ink"
           >
             {REPORT_REASONS.map((item) => (
               <option key={item.id} value={item.id}>
@@ -131,7 +138,7 @@ export function SafetyActions({
           <button
             type="submit"
             disabled={status === "sending"}
-            className="mt-3 h-8 w-full rounded-xl bg-glare text-xs font-semibold text-[#2a1c0a] disabled:opacity-40"
+            className="mt-3 h-11 min-h-11 w-full rounded-xl bg-glare text-xs font-semibold text-[#2a1c0a] disabled:opacity-40"
           >
             {status === "sending" ? "Sending…" : "Send report"}
           </button>

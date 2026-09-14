@@ -172,17 +172,23 @@ export function EmbeddedChat({
 
       <form onSubmit={onSend} className="border-t border-line p-3 sm:p-4">
         <div className="flex items-end gap-2 rounded-2xl border border-line bg-black/25 p-2 focus-within:border-glare/40 focus-within:shadow-[0_0_0_4px_rgba(255,217,160,0.1)]">
+          <label htmlFor="room-composer" className="sr-only">
+            Message
+          </label>
           <input
+            id="room-composer"
             ref={inputRef}
             value={draft}
             onChange={(event) => {
               setDraft(event.target.value.slice(0, MAX_MESSAGE_LENGTH));
               if (sendError) setSendError(null);
             }}
+            name="message"
             placeholder={placeholder}
             maxLength={MAX_MESSAGE_LENGTH}
             disabled={connection === "offline"}
-            className="h-11 min-h-11 flex-1 bg-transparent px-3 text-sm text-ink outline-none placeholder:text-muted disabled:opacity-50"
+            autoComplete="off"
+            className="h-11 min-h-11 flex-1 bg-transparent px-3 text-sm text-ink placeholder:text-muted disabled:opacity-50"
           />
           <button
             type="submit"
