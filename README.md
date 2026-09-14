@@ -18,7 +18,7 @@ Walk in → name or join a room → talk live → share the room link.
 - Safety basics: 13+ notice (not age verification), Community Guidelines / Terms acknowledgment before entering a room, 500-character messages, burst rate limits, plain-text only, in-app report stub, mute/block in this browser
 - In-app **Terms of Service**, **Privacy**, and **Community Guidelines** (plain-language product drafts)
 - Footer links to those pages; no analytics or advertising cookies in v1
-- **Podcast rooms (demo):** curated episode + transcript + live chat at `/r/lobby-ep1`. Not a public podcast host yet.
+- **Podcast rooms:** operator-curated episode + transcript + live chat at `/r/lobby-ep1`. Official embeds or rights-clear in-repo audio only; no user media uploads. Chat is UGC under the Guidelines.
 
 Featured room to share: `/r/lobby`. Demo podcast room: `/r/lobby-ep1`.
 
@@ -115,7 +115,7 @@ For a shared limit, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` 
    - If it is not, click **Add Domain** and enter `glareroom.vercel.app`
    - If that name is already taken on Vercel, add the closest available name (`glare-room.vercel.app`, `glareroom-app.vercel.app`, or a custom domain) and set `NEXT_PUBLIC_SITE_URL` to match
 7. Deploy. Vercel builds on every push to the production branch.
-8. **Review legal copy** before you feature the URL publicly. `/guidelines`, `/terms`, and `/privacy` are product drafts, not lawyer-reviewed documents. Replace or edit them, and bump `LEGAL_ACK_VERSION` in `src/lib/legal.ts` if the agreement materially changes (that re-prompts people before they enter a room). Operator contact is **contact@glare.com**.
+8. `/guidelines`, `/terms`, and `/privacy` now include a **podcast-rooms addendum** (operator-curated episodes, official embeds or rights-clear in-repo audio, transcripts shipped with episodes, no user media uploads, chat as UGC). They remain product drafts. Formal lawyer review is still recommended for **liability**, a **DMCA process if user uploads are ever added**, and **vendor DPAs** (Vercel, Ably). Bump `LEGAL_ACK_VERSION` in `src/lib/legal.ts` if the agreement materially changes (that re-prompts people before they enter a room). Operator contact is **contact@glare.com**.
 9. Smoke-test: open the site → confirm the 13+ notice → agree to Guidelines/Terms → **Open lobby** (or create a room) → send a message in two browser windows → **Share link** → **Mute** / **Block** / **Report** on a message.
 
 Redeploy after changing env vars so `NEXT_PUBLIC_SITE_URL` and the operator email are baked into the client bundle.
@@ -148,20 +148,21 @@ v1 does **not** have a durable message database:
 
 A scheduled deletion job against durable storage is **out of scope for v1**. When a database exists, reuse `MESSAGE_RETENTION_DAYS` / `MESSAGE_RETENTION_MS` for that job instead of inventing a second policy.
 
-## Podcast rooms (demo, not publicly launchable)
+## Podcast rooms (curated only)
 
-Counsel constraints for v1:
+Counsel constraints for v1, now reflected in `/terms` and `/privacy`:
 
-- **Official embeds** or **rights-clear / curated transcripts and audio** only
-- **No user audio or transcript uploads**
-- **ToS and Privacy must be patched before a public podcast-rooms launch**
-- **Prefer a demo/curated episode shipped in-repo** (this is what `/r/lobby-ep1` is)
+- **Operator-curated episodes only**
+- **Official embeds** or **rights-clear in-repo audio**, with a **transcript provided with the episode**
+- **No user audio, transcript, or other media uploads**
+- **Chat is user-generated content** under the Community Guidelines
+- Legal contact: **contact@glare.com**
 
 A room slug can be tied to a catalog episode: HTML5 audio from `/audio/`, a full English transcript, and the same live chat. Chat is the discussion; the transcript is first-class (readable and searchable). Share `/r/{slug}`.
 
-**Do not treat podcast rooms as a public product until Terms and Privacy are patched for that format.** There is no upload UI and no open submission path.
+Terms and Privacy include this addendum, so podcast rooms are **not blocked solely because the documents were unpatched**. Formal lawyer review is still recommended for liability, a DMCA process if user uploads are ever added, and vendor data-processing agreements. There is no upload UI and no open submission path.
 
-Demo: catalog episode `lobby-ep1` + `public/audio/demo-episode.mp3` (royalty-free generated tones) + in-repo transcript in `src/lib/podcast/demo-episode.ts`. Transcript is sanitized to plain text before render (no raw HTML). An approved official embed plus in-repo transcript is the other allowed demo shape; v1 playback is wired for files.
+Demo: catalog episode `lobby-ep1` + `public/audio/demo-episode.mp3` (royalty-free generated tones) + in-repo transcript in `src/lib/podcast/demo-episode.ts`. Transcript is sanitized to plain text before render (no raw HTML). An approved official embed plus in-repo transcript is the other allowed shape; v1 playback is wired for files.
 
 Ethics UX in the room: **Quote** is the cite path (a transcript line is copied into chat); empty chat and the composer helper use a light civility nudge (not a filter); optional `contentWarning` on the episode shows a banner. There is no profanity or “smart” content filter in v1.
 
@@ -176,11 +177,11 @@ Do not add an upload form. Catalog entries only:
 
 Existing legal gates still apply (13+ notice, Guidelines/Terms ack, mute/block, report).
 
-## Legal copy (drafts, not counsel)
+## Legal copy (drafts; podcast addendum included)
 
-The Terms of Service, Privacy Policy, and Community Guidelines in this repo are **plain-language product drafts** written so Anna can ship a public URL with a visible safety layer. They are **not formal legal advice** and have not been reviewed by an attorney.
+The Terms of Service, Privacy Policy, and Community Guidelines in this repo are **plain-language product drafts** with a Counsel-shaped **podcast addendum** (curated embeds + transcripts + chat; no user uploads). They are **not a substitute for a lawyer-reviewed contract**.
 
-Before a public launch, review and revise `/terms`, `/privacy`, and `/guidelines`, and confirm they match how you actually host and log data. Operator contact is **contact@glare.com**. Changing the acknowledgment version in `src/lib/legal.ts` will ask returning visitors to agree again.
+Formal lawyer review is still recommended for **liability**, a **DMCA process if user uploads are ever added**, and **vendor DPAs**. Operator contact is **contact@glare.com**. Changing the acknowledgment version in `src/lib/legal.ts` will ask returning visitors to agree again.
 
 ## Project layout
 

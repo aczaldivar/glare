@@ -1,4 +1,4 @@
-export const LEGAL_ACK_VERSION = 2;
+export const LEGAL_ACK_VERSION = 3;
 export const LEGAL_ACK_STORAGE_KEY = "glare.legal.ack.v1";
 export const LEGAL_ACK_EVENT = "glare-legal-ack";
 export const BLOCKS_STORAGE_KEY = "glare.blocks.v1";
@@ -9,7 +9,7 @@ export const HIDDEN_MESSAGES_EVENT = "glare-hidden-messages";
 export const LEGAL_EFFECTIVE_DATE = "September 14, 2026";
 
 export const LEGAL_DRAFT_DISCLAIMER =
-  "This is a product draft written for Glare Room, not formal legal advice. Review it with counsel before a public launch and replace anything that does not match how you actually operate the service.";
+  "This is a product draft written for Glare Room, not formal legal advice. Podcast rooms are covered by the curated-only addendum on these pages, so they are not blocked solely because the documents were unpatched. Formal lawyer review is still recommended for liability, a DMCA process if user uploads are ever added, and vendor data-processing agreements (hosting and realtime).";
 
 export const AGE_NOTICE =
   "Glare Room is for ages 13 and up. We do not verify age.";
@@ -86,8 +86,8 @@ export const GUIDELINES: LegalDoc = {
     {
       heading: "Podcast rooms",
       body: [
-        "Some rooms are tied to a curated episode. Read the transcript and talk in chat. If you cite a line, quote it from the transcript.",
-        "Episodes are official embeds or rights-clear files we ship. The same public-room rules apply. This demo is English-only. There is no user audio or transcript upload.",
+        "Some rooms are tied to an operator-curated episode. Read the transcript we provide and talk in chat. If you cite a line, quote it from the transcript.",
+        "Episodes are official embeds or rights-clear files we ship. Chat is user-generated content under these Guidelines. There is no user audio, transcript, or other media upload.",
       ],
     },
     {
@@ -156,10 +156,12 @@ export const TERMS: LegalDoc = {
       ],
     },
     {
-      heading: "Podcast rooms (demo)",
+      heading: "Podcast rooms",
       body: [
-        "A podcast room can pair curated audio with a transcript and live chat. v1 only uses official embeds or rights-clear files we ship (the in-repo demo). There is no user audio or transcript upload.",
-        "Do not treat podcast rooms as a public podcast host until these terms and the Privacy Policy are reviewed and patched for that product.",
+        "A podcast room pairs an operator-curated episode with a transcript and live chat. Only the operator adds episodes. You cannot upload, submit, or host your own show.",
+        "Audio is an official embed or a rights-clear file we ship with this product (including the in-repo demo). We provide a transcript with each episode. There is no user audio, transcript, or other media upload.",
+        "Chat in a podcast room is user-generated content. The Community Guidelines and the rest of these terms apply to what you type, including the license in “Your content.”",
+        "This addendum is the Terms patch for that format. Formal lawyer review is still recommended for liability, a DMCA process if user uploads are ever added, and vendor data-processing agreements.",
       ],
     },
     {
@@ -240,8 +242,9 @@ export const PRIVACY: LegalDoc = {
     {
       heading: "Podcast rooms",
       body: [
-        "Demo episodes are static audio and transcript files we ship, or official embeds we add to the catalog. v1 does not collect user-uploaded audio or transcripts.",
-        "Chat in a podcast room is the same public chat described above. Patch this policy before treating podcast rooms as a public product.",
+        "Podcast rooms use operator-curated episodes only. Audio is an official embed or a rights-clear file we ship. We provide the transcript with the episode. We do not collect user-uploaded audio, transcripts, or other media.",
+        "Chat in a podcast room is the same public user-generated chat described above. Playback of a curated file happens in your browser from this site (or from an official embed provider if one is wired). We do not add extra analytics for podcast rooms.",
+        "This addendum is the Privacy patch for that format. Formal lawyer review is still recommended for vendor data-processing agreements (hosting and realtime) and for a DMCA process if user uploads are ever added.",
       ],
     },
     {
