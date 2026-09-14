@@ -174,7 +174,7 @@ export function useRoomChannel(room: string, identity: Identity | null) {
 
     const start = async () => {
       realtime = new Realtime({
-        authUrl: `/api/realtime/token?clientId=${encodeURIComponent(identityId)}`,
+        authUrl: `/api/realtime/token?clientId=${encodeURIComponent(identityId)}&room=${encodeURIComponent(room)}`,
         clientId: identityId,
         closeOnUnload: true,
       });

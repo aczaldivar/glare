@@ -60,6 +60,8 @@ See `.env.example`.
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical URL for metadata and share previews. Local: `http://localhost:3000`. Live: `https://glareroom.vercel.app` |
 | `OPERATOR_CONTACT_EMAIL` | Optional | Operator inbox. Defaults to `contact@glare.com` (also hardcoded in legal copy and the footer). Override only if the inbox changes. |
 | `NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL` | Optional | Same as above if you want to set the public value explicitly. If omitted, `OPERATOR_CONTACT_EMAIL` (or the `contact@glare.com` default) is copied into the client bundle at build time. |
+| `UPSTASH_REDIS_REST_URL` | Recommended on Vercel | Shared rate-limit store. Without it, limits are in-memory per serverless isolate. |
+| `UPSTASH_REDIS_REST_TOKEN` | With the URL above | Upstash REST token for the shared limiter. |
 
 ### Operator contact
 
@@ -80,7 +82,20 @@ The app chooses a realtime provider automatically:
 3. Open **API Keys** and copy a key that can publish, subscribe, and be present
 4. Put it in `.env.local` for a local Ably test, and in Vercel env vars for production
 
-You do **not** put the root key in the browser. The app mints short-lived tokens from `/api/realtime/token`. Clients can subscribe and enter presence; only the server publishes chat messages (after validation and rate limiting).
+You do **not** put the root key in the browser. The app mints short-lived tokens (~10 minutes) from `/api/realtime/token`, scoped to **one** room channel (`glare:room:{room}`) with subscribe + presence only. Clients cannot publish. Only the server publishes chat messages (after validation and rate limiting). Token minting is rate-limited per IP.
+
+## Rate limits
+
+Message send: 8 / 10 seconds per IP and room, plus a short minimum interval. Ably token minting: 12 / 60 seconds per IP.
+
+**Vercel caveat:** the default limiter is an in-memory map on the Node process. Serverless isolates do not share that map, so a client can get a fresh budget on a cold instance. That is enough for local `next dev` / `next start`, not a strong production control.
+
+For a shared limit, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (Upstash Redis REST). When those are set, token, message, and report limits go through Redis and fail closed if Redis errors.
+
+## Security notes
+
+- `ABLY_API_KEY` is server-only. Browser clients receive a token for **one** room (`glare:room:{room}`), 10-minute TTL, subscribe + presence, no publish.
+- Responses include `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` disabling camera/mic/geo, and a Content-Security-Policy that allows this origin plus Ably.
 
 ## Deploy to Vercel and claim glareroom.vercel.app
 
@@ -92,6 +107,7 @@ You do **not** put the root key in the browser. The app mints short-lived tokens
    - `ABLY_API_KEY` = your Ably key
    - `NEXT_PUBLIC_SITE_URL` = `https://glareroom.vercel.app` (or the URL you actually get)
    - `OPERATOR_CONTACT_EMAIL` = `contact@glare.com` (app default; override only if the inbox changes)
+   - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` = recommended so rate limits are shared across serverless instances
 6. **Claim the public URL**
    - Open the project → **Settings → Domains**
    - If the project is named `glareroom`, `glareroom.vercel.app` is assigned automatically
@@ -114,7 +130,7 @@ In **Settings → Domains**, add something like `glareroom.com`, follow DNS inst
 - **Age:** the product is 13+. The UI shows a notice only. There is no hard age gate, birthdate check, or ID verification.
 - **Mute / block:** available in the room. Mute hides that person on this browser; Block is the same local list from the people panel. It does not ban them for anyone else.
 - **Report:** in-app stub. Reports are stored in server memory (and logged) so an operator can see them; they are not a full moderation console.
-- Rate limit: 8 messages / 10 seconds per IP and room, plus a short minimum interval.
+- Rate limit: 8 messages / 10 seconds per IP and room, plus a short minimum interval. Token minting is also limited per IP. In-memory limits are weak on Vercel unless Upstash is configured (see Rate limits).
 - Do not treat this as a private messenger.
 - **No analytics or advertising cookies in v1.** Guest state uses `localStorage` (identity, legal acknowledgment, mute/block), not a tracking cookie.
 

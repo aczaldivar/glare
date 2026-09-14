@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       ? clientNonce
       : undefined;
 
-  const limited = hitRateLimit(`${clientIp(request)}:${slug}`);
+  const limited = await hitRateLimit(`${clientIp(request)}:${slug}`);
   if (!limited.ok) {
     return Response.json(
       { error: "Easy — wait a beat before sending another." },

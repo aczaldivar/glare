@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       ? targetName.trim().slice(0, 24)
       : "Unknown";
 
-  const limited = hitRateLimit(`report:${clientIp(request)}`);
+  const limited = await hitRateLimit(`report:${clientIp(request)}`);
   if (!limited.ok) {
     return Response.json(
       { error: "Thanks — wait a moment before sending another report." },

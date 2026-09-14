@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test src/lib/*.test.ts"
+    "test": "node --import tsx --test src/lib/*.test.ts src/lib/realtime/*.test.ts"
   },
   "dependencies": {
     "ably": "^2.28.0",

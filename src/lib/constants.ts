@@ -13,6 +13,10 @@ export const RATE_LIMIT_WINDOW_MS = 10_000;
 export const RATE_LIMIT_MAX_MESSAGES = 8;
 export const MIN_MESSAGE_INTERVAL_MS = 400;
 
+export const ABLY_TOKEN_TTL_MS = 10 * 60 * 1000;
+export const TOKEN_RATE_LIMIT_WINDOW_MS = 60_000;
+export const TOKEN_RATE_LIMIT_MAX = 12;
+
 export const HISTORY_LIMIT = 80;
 export const PRESENCE_TTL_MS = 45_000;
 export const PRESENCE_HEARTBEAT_MS = 15_000;
