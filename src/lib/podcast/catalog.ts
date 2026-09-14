@@ -28,23 +28,32 @@ function isAllowedMedia(episode: PodcastEpisode) {
   return false;
 }
 
-function sanitizeEpisode(episode: PodcastEpisode): PodcastEpisode | null {
+/** Catalog gate: curated file or official https embed, plus a rights-clear transcript. */
+export function prepareCatalogEpisode(
+  episode: PodcastEpisode,
+): PodcastEpisode | null {
   if (!isAllowedMedia(episode)) return null;
-  return {
-    ...episode,
-    title: sanitizeTranscriptText(episode.title),
-    description: sanitizeTranscriptText(episode.description),
-    contentWarning: episode.contentWarning
-      ? sanitizeTranscriptText(episode.contentWarning)
-      : undefined,
-    transcript: episode.transcript.map((cue) => ({
+  const transcript = episode.transcript
+    .map((cue) => ({
       ...cue,
       text: sanitizeTranscriptText(cue.text),
-    })),
+    }))
+    .filter((cue) => cue.text.length > 0);
+  if (transcript.length === 0) return null;
+  const contentWarning = episode.contentWarning
+    ? sanitizeTranscriptText(episode.contentWarning)
+    : "";
+  return {
+    ...episode,
+    audioUrl: episode.media.src,
+    title: sanitizeTranscriptText(episode.title),
+    description: sanitizeTranscriptText(episode.description),
+    contentWarning: contentWarning || undefined,
+    transcript,
   };
 }
 
-const CATALOG = RAW_CATALOG.map(sanitizeEpisode).filter(
+const CATALOG = RAW_CATALOG.map(prepareCatalogEpisode).filter(
   (episode): episode is PodcastEpisode => Boolean(episode),
 );
 

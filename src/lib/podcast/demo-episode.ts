@@ -10,8 +10,10 @@ export const DEMO_EPISODE: PodcastEpisode = {
   description:
     "A short English demo of a podcast room: listen, read the transcript, and talk about the episode in live chat.",
   media: { kind: "file", src: "/audio/demo-episode.mp3" },
+  audioUrl: "/audio/demo-episode.mp3",
   durationMs: 72_000,
   language: "en",
+  // Optional contentWarning renders a banner. Demo has none.
   transcript: [
     {
       id: "c1",

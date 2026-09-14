@@ -93,7 +93,7 @@ export function JoinForm() {
           autoComplete="off"
           autoCapitalize="none"
           spellCheck={false}
-          className="h-14 flex-1 rounded-2xl border border-line bg-black/30 px-4 text-lg text-ink outline-none transition placeholder:text-muted/70 focus:border-glare/50 focus:shadow-[0_0_0_4px_rgba(255,217,160,0.12)]"
+          className="h-14 flex-1 rounded-2xl border border-line bg-black/30 px-4 text-lg text-ink transition placeholder:text-muted/70 focus:border-glare/50"
         />
         <button
           type="submit"
@@ -115,8 +115,9 @@ export function JoinForm() {
       </p>
       <HoneypotField value={honeypot} onChange={setHoneypot} />
       {needsAck ? (
-        <label className="flex items-start gap-3 text-sm leading-6 text-muted">
+        <label htmlFor="landing-legal-ack" className="flex min-h-11 items-start gap-3 text-sm leading-6 text-muted">
           <input
+            id="landing-legal-ack"
             type="checkbox"
             checked={agreed}
             onChange={(event) => {

@@ -22,12 +22,17 @@ export function NameChip({
   if (editing) {
     return (
       <form onSubmit={onSave} className="flex min-w-0 items-center gap-2">
+        <label htmlFor="display-name" className="sr-only">
+          Display name
+        </label>
         <input
+          id="display-name"
           value={nameDraft}
           onChange={(event) => onNameDraft(event.target.value)}
           maxLength={MAX_NAME_LENGTH}
-          aria-label="Display name"
-          className="h-11 min-h-11 min-w-0 max-w-40 rounded-full border border-line bg-black/30 px-3 text-sm outline-none focus:border-glare/50"
+          name="display-name"
+          autoComplete="nickname"
+          className="h-11 min-h-11 min-w-0 max-w-40 rounded-full border border-line bg-black/30 px-3 text-sm focus:border-glare/50"
           autoFocus
         />
         <button

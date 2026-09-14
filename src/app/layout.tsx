@@ -60,11 +60,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${instrument.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <div className="glare-shell">
           <div className="glare-orb" />
           <div className="glare-vignette" />
           <div className="glare-grain" />
-          {children}
+          <div id="main-content">{children}</div>
         </div>
       </body>
     </html>

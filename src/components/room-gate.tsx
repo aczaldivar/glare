@@ -87,8 +87,9 @@ export function RoomGate({
         <HoneypotField value={honeypot} onChange={setHoneypot} />
 
         {needsLegal ? (
-          <label className="mt-6 flex items-start gap-3 text-sm leading-6 text-muted">
+          <label htmlFor="legal-ack" className="mt-6 flex min-h-11 items-start gap-3 text-sm leading-6 text-muted">
             <input
+              id="legal-ack"
               type="checkbox"
               checked={agreed}
               onChange={(event) => setAgreed(event.target.checked)}

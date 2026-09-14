@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { activeCueId as cueIdAtTime } from "@/lib/podcast/cues";
 import type { TranscriptCue } from "@/lib/podcast/types";
 
 function formatClock(ms: number) {
@@ -29,12 +30,10 @@ export function TranscriptPanel({
   const activeRef = useRef<HTMLLIElement | null>(null);
   const ignoreScroll = useRef(false);
 
-  const activeId = useMemo(() => {
-    const match = cues.find(
-      (cue) => currentMs >= cue.startMs && currentMs < cue.endMs,
-    );
-    return match?.id ?? cues[cues.length - 1]?.id ?? null;
-  }, [cues, currentMs]);
+  const activeId = useMemo(
+    () => cueIdAtTime(cues, currentMs),
+    [cues, currentMs],
+  );
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -57,9 +56,9 @@ export function TranscriptPanel({
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
-            Transcript
+            Searchable · English
           </p>
-          <p className="text-sm text-ink">Searchable · English</p>
+          <h2 className="text-sm text-ink">Transcript (same conversation)</h2>
         </div>
         <button
           type="button"
@@ -74,13 +73,14 @@ export function TranscriptPanel({
         </button>
       </div>
       <div className="border-b border-line px-4 py-3">
-        <label className="block">
+        <label htmlFor="transcript-search" className="block">
           <span className="sr-only">Search transcript</span>
           <input
+            id="transcript-search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search the transcript"
-            className="h-11 w-full rounded-2xl border border-line bg-black/30 px-3 text-sm text-ink outline-none placeholder:text-muted focus:border-glare/50"
+            className="h-11 w-full rounded-2xl border border-line bg-black/30 px-3 text-sm text-ink placeholder:text-muted focus:border-glare/50"
           />
         </label>
       </div>
@@ -91,7 +91,11 @@ export function TranscriptPanel({
           if (follow) onFollow(false);
         }}
       >
-        {visible.length === 0 ? (
+        {cues.length === 0 ? (
+          <p className="px-2 py-8 text-center text-sm text-muted">
+            No transcript for this episode.
+          </p>
+        ) : visible.length === 0 ? (
           <p className="px-2 py-8 text-center text-sm text-muted">
             No lines match that search.
           </p>
@@ -103,20 +107,25 @@ export function TranscriptPanel({
                 <li
                   key={cue.id}
                   ref={active ? activeRef : undefined}
-                  className={`rounded-2xl px-3 py-3 ${
-                    active ? "bg-glare/10" : "bg-transparent"
+                  aria-current={active ? "true" : undefined}
+                  className={`rounded-r-2xl border-l-4 px-3 py-3 ${
+                    active
+                      ? "border-l-glare bg-glare/10"
+                      : "border-l-transparent bg-transparent"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-2">
                     <button
                       type="button"
                       onClick={() => {
                         onFollow(true);
                         onSeek(cue.startMs);
                       }}
+                      aria-label={`Seek to ${formatClock(cue.startMs)}`}
                       className="min-w-0 flex-1 text-left"
                     >
                       <p className="font-mono text-[10px] text-muted">
+                        {active ? "Now · " : null}
                         {formatClock(cue.startMs)}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-ink">{cue.text}</p>
@@ -124,7 +133,8 @@ export function TranscriptPanel({
                     <button
                       type="button"
                       onClick={() => onQuote(cue)}
-                      className="mt-1 shrink-0 text-[11px] text-glare underline-offset-4 hover:underline"
+                      aria-label="Quote this line in chat"
+                      className="box-border inline-flex h-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-line px-3 text-[11px] text-glare hover:border-glare/50"
                     >
                       Quote
                     </button>

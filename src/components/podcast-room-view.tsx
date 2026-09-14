@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { DeployNotReady } from "@/components/deploy-not-ready";
 import { EmbeddedChat } from "@/components/embedded-chat";
-import { EpisodePlayer } from "@/components/episode-player";
+import {
+  EpisodePlayer,
+  PLAYBACK_RATES,
+} from "@/components/episode-player";
 import { GlareMark } from "@/components/glare-mark";
 import { NameChip } from "@/components/name-chip";
 import { RoomGate } from "@/components/room-gate";
@@ -12,11 +15,17 @@ import { SiteFooter } from "@/components/site-footer";
 import { TranscriptPanel } from "@/components/transcript-panel";
 import { useIdentity } from "@/hooks/use-identity";
 import { useLegalAck } from "@/hooks/use-legal-ack";
+import { usePodcastTab } from "@/hooks/use-podcast-tab";
 import { useRealtimeConfig } from "@/hooks/use-realtime-config";
 import { useRoomChannel } from "@/hooks/use-room-channel";
 import type { PodcastEpisode, TranscriptCue } from "@/lib/podcast/types";
 import { SAFETY_BANNER } from "@/lib/legal";
 import { curatedFileSrc } from "@/lib/podcast/catalog";
+
+const ETHICS_SOFT_NUDGES = [
+  "If you’re ahead, mark spoilers.",
+  "Disagree with the idea, not the person.",
+];
 
 export function PodcastRoomView({ episode }: { episode: PodcastEpisode }) {
   const legal = useLegalAck();
@@ -67,7 +76,9 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
   const [copied, setCopied] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
-  const [mobileTab, setMobileTab] = useState<"transcript" | "chat">("transcript");
+  const [mobileTab, selectMobileTab] = usePodcastTab(episode.roomSlug);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const fileSrc = curatedFileSrc(episode);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -85,7 +96,11 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("ended", onPause);
     };
-  }, [ready]);
+  }, [fileSrc]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.playbackRate = playbackRate;
+  }, [playbackRate, fileSrc]);
 
   function onToggle() {
     const audio = audioRef.current;
@@ -97,13 +112,41 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
   function onSeek(ms: number) {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.currentTime = ms / 1000;
-    setCurrentMs(ms);
+    const next = Math.min(Math.max(0, ms), episode.durationMs);
+    audio.currentTime = next / 1000;
+    setCurrentMs(next);
+  }
+
+  function onSkip(deltaMs: number) {
+    onSeek(currentMs + deltaMs);
+  }
+
+  function onCycleRate() {
+    const audio = audioRef.current;
+    const current = audio?.playbackRate ?? playbackRate;
+    const index = PLAYBACK_RATES.indexOf(
+      current as (typeof PLAYBACK_RATES)[number],
+    );
+    const next = PLAYBACK_RATES[(index + 1) % PLAYBACK_RATES.length];
+    if (audio) audio.playbackRate = next;
+    setPlaybackRate(next);
   }
 
   function onQuote(cue: TranscriptCue) {
     setQuoteSeed({ id: Date.now(), text: `“${cue.text}”` });
-    setMobileTab("chat");
+    selectMobileTab("chat");
+  }
+
+  function onMobileTabKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+    event.preventDefault();
+    const next = mobileTab === "transcript" ? "chat" : "transcript";
+    selectMobileTab(next);
+    const id =
+      next === "chat" ? "podcast-tab-chat" : "podcast-tab-transcript";
+    window.requestAnimationFrame(() => {
+      document.getElementById(id)?.focus();
+    });
   }
 
   async function shareRoom() {
@@ -123,15 +166,23 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
     if (result.ok) setEditingName(false);
   }
 
+  const audioEl = fileSrc ? (
+    <audio
+      ref={audioRef}
+      src={fileSrc}
+      preload="metadata"
+      aria-label={episode.title}
+    />
+  ) : null;
+
   if (!ready || !identity) {
     return (
       <div className="flex min-h-dvh items-center justify-center text-muted">
+        {audioEl}
         Warming the room…
       </div>
     );
   }
-
-  const fileSrc = curatedFileSrc(episode);
 
   const chat = (
     <EmbeddedChat
@@ -142,9 +193,12 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       notice={channel.notice}
       send={channel.send}
       quoteSeed={quoteSeed}
-      emptyTitle="Talk about the episode."
+      emptyTitle="Read, listen, or both"
       emptyBody="Quote a transcript line if you are citing it. Anyone with the link can walk in."
       emptyHint="Public room. Be decent with the people who walk in."
+      placeholder="Quote a line, then add your take"
+      helperText="Quote the transcript to cite a line. Public room — be decent."
+      softNudges={ETHICS_SOFT_NUDGES}
       onShare={shareRoom}
       copied={copied}
     />
@@ -163,9 +217,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 pb-[env(safe-area-inset-bottom)] pt-4 sm:px-6">
-      {fileSrc ? (
-        <audio ref={audioRef} src={fileSrc} preload="metadata" />
-      ) : null}
+      {audioEl}
 
       <header className="panel mb-4 flex flex-col gap-4 rounded-[24px] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <Link href="/" className="shrink-0" aria-label="Back to Glare Room">
@@ -205,7 +257,10 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       </header>
 
       {episode.contentWarning ? (
-        <p className="mb-3 rounded-2xl border border-ember/40 bg-ember/10 px-4 py-3 text-sm text-ember">
+        <p
+          role="status"
+          className="mb-3 rounded-2xl border border-ember/40 bg-ember/10 px-4 py-3 text-sm text-ember"
+        >
           Content warning: {episode.contentWarning}
         </p>
       ) : null}
@@ -222,8 +277,12 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           currentMs={currentMs}
           playing={playing}
           compact
+          disabled={!fileSrc}
+          playbackRate={playbackRate}
           onToggle={onToggle}
           onSeek={onSeek}
+          onSkip={onSkip}
+          onCycleRate={onCycleRate}
         />
       </div>
       <div className="sticky top-2 z-10 mb-4 hidden lg:block">
@@ -231,15 +290,29 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           episode={episode}
           currentMs={currentMs}
           playing={playing}
+          disabled={!fileSrc}
+          playbackRate={playbackRate}
           onToggle={onToggle}
           onSeek={onSeek}
+          onSkip={onSkip}
+          onCycleRate={onCycleRate}
         />
       </div>
 
-      <div className="mb-3 flex gap-2 lg:hidden">
+      <div
+        className="mb-3 flex gap-2 lg:hidden"
+        role="tablist"
+        aria-label="Episode views"
+        onKeyDown={onMobileTabKeyDown}
+      >
         <button
           type="button"
-          onClick={() => setMobileTab("transcript")}
+          role="tab"
+          id="podcast-tab-transcript"
+          aria-controls="podcast-panel-transcript"
+          aria-selected={mobileTab === "transcript"}
+          tabIndex={mobileTab === "transcript" ? 0 : -1}
+          onClick={() => selectMobileTab("transcript")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "transcript"
               ? "border-glare/50 text-ink"
@@ -250,7 +323,12 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
         </button>
         <button
           type="button"
-          onClick={() => setMobileTab("chat")}
+          role="tab"
+          id="podcast-tab-chat"
+          aria-controls="podcast-panel-chat"
+          aria-selected={mobileTab === "chat"}
+          tabIndex={mobileTab === "chat" ? 0 : -1}
+          onClick={() => selectMobileTab("chat")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "chat"
               ? "border-glare/50 text-ink"
@@ -261,8 +339,11 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
         </button>
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-4 pb-4 lg:grid-cols-2">
+      <div className="grid min-h-0 flex-1 gap-4 pb-4 lg:grid-cols-[1.2fr_1fr]">
         <div
+          id="podcast-panel-transcript"
+          role="tabpanel"
+          aria-labelledby="podcast-tab-transcript"
           className={`min-h-[50dvh] flex-col ${
             mobileTab === "transcript" ? "flex" : "hidden"
           } lg:flex`}
@@ -270,6 +351,9 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           {transcript}
         </div>
         <div
+          id="podcast-panel-chat"
+          role="tabpanel"
+          aria-labelledby="podcast-tab-chat"
           className={`min-h-[50dvh] flex-col ${
             mobileTab === "chat" ? "flex" : "hidden"
           } lg:flex`}

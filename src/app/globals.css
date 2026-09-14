@@ -130,9 +130,44 @@ textarea {
   font: inherit;
 }
 
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[role="tab"]:focus-visible,
+[role="button"]:focus-visible,
+[role="slider"]:focus-visible {
+  outline: 2px solid var(--glare-hot);
+  outline-offset: 3px;
+}
+
 .bg-glare:focus-visible {
   outline: 2px solid var(--glare-hot);
   outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 80;
+  border-radius: 999px;
+  background: var(--glare);
+  color: #2a1c0a;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
 }
 
 ::selection {
