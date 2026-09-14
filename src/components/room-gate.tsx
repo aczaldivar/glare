@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { GlareMark } from "@/components/glare-mark";
 import { SiteFooter } from "@/components/site-footer";
-import { SAFETY_BANNER } from "@/lib/legal";
+import { AGE_NOTICE, SAFETY_BANNER } from "@/lib/legal";
 import { roomDisplayName } from "@/lib/rooms";
 
 export function RoomGate({
@@ -37,6 +37,7 @@ export function RoomGate({
         <p className="mt-3 text-sm leading-6 text-muted">
           Public room. No accounts. Anyone with the link can read what you send.
         </p>
+        <p className="mt-3 text-sm leading-6 text-muted">{AGE_NOTICE}</p>
 
         <ul className="mt-6 space-y-2 text-sm text-ink">
           <li>No illegal content, exploitation, or abuse.</li>

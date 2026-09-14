@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { AgeNotice } from "@/components/age-notice";
 import { useLegalAck } from "@/hooks/use-legal-ack";
 import { isValidRoomSlug, roomPath, slugifyRoom } from "@/lib/rooms";
 
@@ -89,11 +90,16 @@ export function JoinForm() {
             <Link href="/terms" className="text-glare underline-offset-4 hover:underline">
               Terms
             </Link>
+            . I have read the{" "}
+            <Link href="/privacy" className="text-glare underline-offset-4 hover:underline">
+              Privacy Policy
+            </Link>
             .
           </span>
         </label>
       ) : null}
       {error ? <p className="text-sm text-ember">{error}</p> : null}
+      <AgeNotice />
     </form>
   );
 }

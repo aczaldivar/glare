@@ -76,7 +76,7 @@ export function SafetyActions({
         onClick={onUnblock}
         className="text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
       >
-        Unhide
+        Unmute / Unblock
       </button>
     );
   }
@@ -105,7 +105,7 @@ export function SafetyActions({
           onClick={onBlock}
           className="text-[11px] text-muted underline-offset-4 hover:text-ink hover:underline"
         >
-          Hide person
+          {onHideMessage ? "Mute" : "Block"}
         </button>
       </div>
       {open && status !== "done" ? (

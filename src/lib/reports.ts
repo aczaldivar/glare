@@ -1,4 +1,5 @@
 import type { ReportReason } from "@/lib/legal";
+import { pruneByRetention } from "@/lib/retention";
 
 export type SafetyReport = {
   id: string;
@@ -30,9 +31,8 @@ function store() {
 export function addReport(report: SafetyReport) {
   const reports = store();
   reports.push(report);
-  if (reports.length > MAX_REPORTS) {
-    reports.splice(0, reports.length - MAX_REPORTS);
-  }
+  const kept = pruneByRetention(reports).slice(-MAX_REPORTS);
+  reports.splice(0, reports.length, ...kept);
   console.info("[glare:report]", {
     id: report.id,
     room: report.room,

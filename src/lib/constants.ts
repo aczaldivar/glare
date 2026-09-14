@@ -16,6 +16,10 @@ export const HISTORY_LIMIT = 80;
 export const PRESENCE_TTL_MS = 45_000;
 export const PRESENCE_HEARTBEAT_MS = 15_000;
 
+export const MINIMUM_AGE = 13;
+export const MESSAGE_RETENTION_DAYS = 30;
+export const MESSAGE_RETENTION_MS = MESSAGE_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
 export const SUGGESTED_ROOMS = [
   { slug: "lobby", label: "Lobby", blurb: "The front door" },
   { slug: "afterhours", label: "Afterhours", blurb: "Late light" },

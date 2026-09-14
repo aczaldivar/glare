@@ -23,7 +23,7 @@ export default function Home() {
       <main className="grid flex-1 items-center gap-12 py-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:gap-16">
         <section className="rise-in">
           <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-glare/80">
-            Public rooms · live conversation
+            Public rooms · live conversation · 13+
           </p>
           <h1 className="mt-5 max-w-xl font-display text-5xl leading-[1.05] text-ink sm:text-7xl">
             Walk in.

@@ -11,6 +11,9 @@ export const LEGAL_EFFECTIVE_DATE = "September 14, 2026";
 export const LEGAL_DRAFT_DISCLAIMER =
   "This is a product draft written for Glare Room, not formal legal advice. Review it with counsel before a public launch and replace anything that does not match how you actually operate the service.";
 
+export const AGE_NOTICE =
+  "Glare Room is for ages 13 and up. We do not verify age.";
+
 export const SAFETY_BANNER =
   "No illegal content. Harassment, exploitation, and abuse are not allowed. We may hide messages, remove rooms, or block access.";
 
@@ -76,7 +79,7 @@ export const GUIDELINES: LegalDoc = {
     {
       heading: "If something is wrong",
       body: [
-        "Use Report on a message or person. That logs a report for the operator. You can also hide a person locally in your browser.",
+        "Use Report on a message or person. That logs a report for the operator. Mute or block someone locally in your browser if you do not want to see them.",
         "Reporting is not a substitute for contacting law enforcement if someone is in immediate danger.",
       ],
     },
@@ -94,13 +97,13 @@ export const TERMS: LegalDoc = {
       heading: "The service",
       body: [
         "Glare Room is a public, real-time chat product. You can create or join rooms by name, choose an optional display name, and share a link.",
-        "There are no accounts in this version. Your browser stores a guest identity, your legal acknowledgment, and any people you have hidden.",
+        "There are no accounts in this version. Your browser stores a guest identity, your legal acknowledgment, and anyone you have muted or blocked.",
       ],
     },
     {
       heading: "Eligibility and acceptable use",
       body: [
-        "You must be old enough to use an unaccounted public chat service in your country, and you must not use Glare Room if applicable law forbids it.",
+        "Glare Room is for people 13 and older. We show that notice; we do not verify age.",
         "You agree to follow the Community Guidelines. You will not post illegal content, abuse others, attempt to break the service, or use it to operate malware, scams, or unauthorized access to systems.",
       ],
     },
@@ -108,7 +111,7 @@ export const TERMS: LegalDoc = {
       heading: "Public rooms, not private messages",
       body: [
         "Do not treat Glare Room as a confidential messenger. Messages may be visible to anyone who joins the room, to operators, and to the infrastructure that delivers realtime events.",
-        "Messages are intended to be ephemeral. They are not a durable archive, and we do not promise that history will be kept or that it will be deleted on a particular schedule.",
+        "Messages are intended to be ephemeral. The product target is to retain chat for about 30 days, then drop it. v1 does not keep a durable message database, so history may disappear sooner.",
       ],
     },
     {
@@ -157,12 +160,13 @@ export const PRIVACY: LegalDoc = {
         "Technical data that comes with any web request, such as IP address, user agent, and timestamps, which we may see in server logs.",
         "Reports you submit: room, target, optional reason, and your guest id, stored so an operator can review them.",
         "Legal acknowledgment: a flag in your browser that you agreed to the Community Guidelines and Terms.",
+        "Mute/block lists: stored only in your browser so you can stop seeing someone.",
       ],
     },
     {
       heading: "What stays on your device",
       body: [
-        "Display name, guest id, people you have hidden, messages you have hidden, and the legal acknowledgment live in localStorage on this browser.",
+        "Display name, guest id, mute/block lists, hidden messages, and the legal acknowledgment live in localStorage on this browser.",
         "Clearing site data in your browser removes that local state. It does not unsay messages already seen by other people in a room.",
       ],
     },
@@ -170,7 +174,14 @@ export const PRIVACY: LegalDoc = {
       heading: "Processors",
       body: [
         "The site may be hosted on Vercel. Realtime delivery in production uses Ably. Those providers process data according to their own terms in order to host and transmit the service.",
-        "We do not sell your personal information. We do not run advertising trackers in this version.",
+        "We do not sell your personal information. v1 does not use analytics SDKs, advertising cookies, or tracking pixels.",
+      ],
+    },
+    {
+      heading: "Cookies and analytics",
+      body: [
+        "v1 does not set advertising or analytics cookies. Guest state uses localStorage (identity, legal acknowledgment, mute/block), not a tracking cookie.",
+        "The host or browser may still use cookies that are strictly needed to run or protect the site itself.",
       ],
     },
     {
@@ -183,27 +194,27 @@ export const PRIVACY: LegalDoc = {
     {
       heading: "How long it lasts",
       body: [
-        "Chat history is ephemeral by design. Local in-memory data is gone when the process restarts. Production rewind, if enabled by the realtime provider, is short-lived.",
-        "Reports and server logs last only as long as the operator keeps them. In this draft they are not a permanent case-management system.",
+        "Chat history is intended to last about 30 days, then be dropped. In v1 there is no durable message database; in-memory buffers and realtime rewind are usually much shorter. The app still ignores messages older than 30 days if they appear.",
+        "Reports and server logs should follow the same ~30 day cap. A scheduled deletion job for durable storage is documented in the README until it is wired to a database.",
       ],
     },
     {
       heading: "Your choices",
       body: [
         "Do not enter a room if you do not want to be in a public conversation.",
-        "Change or clear your display name, hide people locally, and stop using the site. Because there is no account, we cannot offer a global “delete my profile” button that reaches other people’s screens.",
+        "Change or clear your display name, mute or block people locally, and stop using the site. Because there is no account, we cannot offer a global “delete my profile” button that reaches other people’s screens.",
       ],
     },
     {
       heading: "Children",
       body: [
-        "Glare Room is not directed at children. Do not use it to share information about minors or to contact them. We will remove apparent child sexual abuse material and related exploitation without notice.",
+        "Glare Room is for ages 13 and up. We show that notice and do not verify age. Do not use it to share information about minors or to contact them. We will remove apparent child sexual abuse material and related exploitation without notice.",
       ],
     },
     {
       heading: "Contact",
       body: [
-        "Until an operator publishes a dedicated contact address, treat reports submitted in-app as the primary way to flag abuse on this instance.",
+        "Set OPERATOR_CONTACT_EMAIL (or NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL) to publish an operator inbox. Until that is set, use Report in a room to flag abuse on this instance.",
       ],
     },
   ],

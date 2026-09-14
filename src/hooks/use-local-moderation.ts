@@ -89,6 +89,10 @@ export function useLocalModeration() {
     );
   }, []);
 
+  const clearBlocks = useCallback(() => {
+    writeList(BLOCKS_STORAGE_KEY, BLOCKS_EVENT, []);
+  }, []);
+
   const hideMessage = useCallback((id: string) => {
     writeList(HIDDEN_MESSAGES_STORAGE_KEY, HIDDEN_MESSAGES_EVENT, [
       ...parseList(window.localStorage.getItem(HIDDEN_MESSAGES_STORAGE_KEY)),
@@ -101,6 +105,7 @@ export function useLocalModeration() {
     hiddenMessageIds,
     blockUser,
     unblockUser,
+    clearBlocks,
     hideMessage,
     isBlocked: (id: string) => blockedIds.has(id),
     isMessageHidden: (id: string) => hiddenMessageIds.has(id),

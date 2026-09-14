@@ -13,6 +13,7 @@ import { useRoomChannel, type ConnectionState } from "@/hooks/use-room-channel";
 import { MAX_MESSAGE_LENGTH, MAX_NAME_LENGTH } from "@/lib/constants";
 import { colorFromId, initialsFromName, type Identity } from "@/lib/identity";
 import { SAFETY_BANNER } from "@/lib/legal";
+import { isWithinRetention } from "@/lib/retention";
 import { normalizeMessageText } from "@/lib/messages";
 import type { ChatMessage, PresenceMember } from "@/lib/realtime/types";
 import { roomDisplayName } from "@/lib/rooms";
@@ -69,6 +70,7 @@ function RoomLive({ room }: { room: string }) {
     () =>
       channel.messages.filter(
         (message) =>
+          isWithinRetention(message.createdAt) &&
           !moderation.blockedIds.has(message.authorId) &&
           !moderation.hiddenMessageIds.has(message.id),
       ),
@@ -87,8 +89,8 @@ function RoomLive({ room }: { room: string }) {
             },
           ]
         : [];
-    return list.filter((member) => !moderation.blockedIds.has(member.id));
-  }, [channel.members, identity, moderation.blockedIds]);
+    return list;
+  }, [channel.members, identity]);
 
   useEffect(() => {
     const node = scrollerRef.current;
@@ -210,9 +212,18 @@ function RoomLive({ room }: { room: string }) {
             ))}
           </ul>
           {moderation.blockedIds.size > 0 ? (
-            <p className="mt-4 text-[11px] text-muted">
-              {moderation.blockedIds.size} hidden locally in this browser.
-            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] text-muted">
+              <p>
+                {moderation.blockedIds.size} muted or blocked in this browser.
+              </p>
+              <button
+                type="button"
+                onClick={moderation.clearBlocks}
+                className="underline-offset-4 hover:text-ink hover:underline"
+              >
+                Unmute all
+              </button>
+            </div>
           ) : null}
         </aside>
 

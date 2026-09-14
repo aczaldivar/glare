@@ -1,4 +1,5 @@
 import { HISTORY_LIMIT, PRESENCE_TTL_MS } from "@/lib/constants";
+import { pruneByRetention } from "@/lib/retention";
 import type {
   BusEvent,
   ChatMessage,
@@ -68,12 +69,16 @@ export function currentMembers(room: string): PresenceMember[] {
 }
 
 export function currentHistory(room: string): ChatMessage[] {
-  return [...roomState(room).messages];
+  const state = roomState(room);
+  state.messages = pruneByRetention(state.messages).slice(-HISTORY_LIMIT);
+  return [...state.messages];
 }
 
 export function publishLocalMessage(message: ChatMessage) {
   const state = roomState(message.room);
-  state.messages = [...state.messages, message].slice(-HISTORY_LIMIT);
+  state.messages = pruneByRetention([...state.messages, message]).slice(
+    -HISTORY_LIMIT,
+  );
   emit(state, { type: "message", message });
 }
 
