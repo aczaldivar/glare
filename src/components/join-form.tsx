@@ -4,21 +4,38 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { AgeNotice } from "@/components/age-notice";
+import { HoneypotField } from "@/components/honeypot-field";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 import { useLegalAck } from "@/hooks/use-legal-ack";
+import { useRealtimeConfig } from "@/hooks/use-realtime-config";
+import { requestHumanSession } from "@/lib/entry-client";
+import { honeypotFilled } from "@/lib/honeypot";
 import { isValidRoomSlug, roomPath, slugifyRoom } from "@/lib/rooms";
 
 export function JoinForm() {
   const router = useRouter();
   const legal = useLegalAck();
+  const config = useRealtimeConfig();
   const [value, setValue] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const slug = useMemo(() => slugifyRoom(value || "lobby"), [value]);
   const valid = isValidRoomSlug(slug);
   const needsAck = legal.ready && !legal.acknowledged;
+  const needsHuman = config.ready && config.botGuard === "turnstile" && !config.verified;
+  const canSubmit =
+    valid &&
+    (!needsAck || agreed) &&
+    (!needsHuman || Boolean(turnstileToken)) &&
+    !submitting &&
+    config.ready &&
+    legal.ready;
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const next = slugifyRoom(value || "lobby");
     if (!isValidRoomSlug(next)) {
@@ -29,8 +46,33 @@ export function JoinForm() {
       setError("Agree to the Community Guidelines and Terms to enter a room.");
       return;
     }
-    if (needsAck) legal.acknowledge();
+    if (needsHuman && !turnstileToken) {
+      setError("Complete the check to enter.");
+      return;
+    }
+    if (honeypotFilled(honeypot)) {
+      setError("Could not enter.");
+      return;
+    }
+
+    setSubmitting(true);
     setError(null);
+    if (config.botGuard !== "missing") {
+      const result = await requestHumanSession({
+        honeypot,
+        turnstileToken,
+      });
+      if (!result.ok) {
+        setSubmitting(false);
+        setError(result.error);
+        setTurnstileToken(null);
+        return;
+      }
+    }
+    setSubmitting(false);
+
+    if (needsAck) legal.acknowledge();
+    config.markVerified();
     router.push(roomPath(next));
   }
 
@@ -55,9 +97,10 @@ export function JoinForm() {
         />
         <button
           type="submit"
-          className="h-14 rounded-2xl bg-glare px-6 text-sm font-semibold tracking-wide text-[#2a1c0a] transition hover:bg-glare-hot"
+          disabled={!canSubmit}
+          className="h-14 rounded-2xl bg-glare px-6 text-sm font-semibold tracking-wide text-[#2a1c0a] transition hover:bg-glare-hot disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Enter room
+          {submitting ? "Checking…" : "Enter room"}
         </button>
       </div>
       <p className="font-mono text-xs text-muted">
@@ -70,6 +113,7 @@ export function JoinForm() {
           <span className="text-ember">That name cannot be used.</span>
         )}
       </p>
+      <HoneypotField value={honeypot} onChange={setHoneypot} />
       {needsAck ? (
         <label className="flex items-start gap-3 text-sm leading-6 text-muted">
           <input
@@ -97,6 +141,12 @@ export function JoinForm() {
             .
           </span>
         </label>
+      ) : null}
+      {needsHuman && config.turnstileSiteKey ? (
+        <div className="space-y-2">
+          <p className="text-sm text-muted">A quick check before the room opens.</p>
+          <TurnstileWidget siteKey={config.turnstileSiteKey} onToken={setTurnstileToken} />
+        </div>
       ) : null}
       {error ? <p className="text-sm text-ember">{error}</p> : null}
       <AgeNotice />

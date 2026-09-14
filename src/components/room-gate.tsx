@@ -2,24 +2,61 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { HoneypotField } from "@/components/honeypot-field";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 import { GlareMark } from "@/components/glare-mark";
 import { SiteFooter } from "@/components/site-footer";
+import { requestHumanSession } from "@/lib/entry-client";
+import { honeypotFilled } from "@/lib/honeypot";
 import { AGE_NOTICE, SAFETY_BANNER } from "@/lib/legal";
 import { roomDisplayName } from "@/lib/rooms";
 
 export function RoomGate({
   room,
   onAccept,
+  needsLegal = true,
+  needsHuman = false,
+  turnstileSiteKey = null,
 }: {
   room: string;
   onAccept: () => void;
+  needsLegal?: boolean;
+  needsHuman?: boolean;
+  turnstileSiteKey?: string | null;
 }) {
   const [agreed, setAgreed] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const title = roomDisplayName(room);
+  const legalReady = !needsLegal || agreed;
+  const humanReady = !needsHuman || Boolean(turnstileToken);
+  const canSubmit = legalReady && humanReady && !submitting;
 
-  function onSubmit(event: FormEvent) {
+  async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!agreed) return;
+    if (!legalReady) return;
+    if (needsHuman && !turnstileToken) {
+      setError("Complete the check to enter.");
+      return;
+    }
+    if (honeypotFilled(honeypot)) {
+      setError("Could not enter.");
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    const result = await requestHumanSession({
+      honeypot,
+      turnstileToken,
+    });
+    setSubmitting(false);
+    if (!result.ok) {
+      setError(result.error);
+      setTurnstileToken(null);
+      return;
+    }
     onAccept();
   }
 
@@ -47,37 +84,50 @@ export function RoomGate({
 
         <p className="mt-6 text-sm leading-6 text-ember">{SAFETY_BANNER}</p>
 
-        <label className="mt-6 flex items-start gap-3 text-sm leading-6 text-muted">
-          <input
-            type="checkbox"
-            checked={agreed}
-            onChange={(event) => setAgreed(event.target.checked)}
-            className="mt-1 size-4 shrink-0 accent-[#e8a15a]"
-          />
-          <span>
-            I agree to the{" "}
-            <Link href="/guidelines" className="text-glare underline-offset-4 hover:underline">
-              Community Guidelines
-            </Link>{" "}
-            and{" "}
-            <Link href="/terms" className="text-glare underline-offset-4 hover:underline">
-              Terms
-            </Link>
-            . I have read the{" "}
-            <Link href="/privacy" className="text-glare underline-offset-4 hover:underline">
-              Privacy Policy
-            </Link>
-            .
-          </span>
-        </label>
+        <HoneypotField value={honeypot} onChange={setHoneypot} />
+
+        {needsLegal ? (
+          <label className="mt-6 flex items-start gap-3 text-sm leading-6 text-muted">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(event) => setAgreed(event.target.checked)}
+              className="mt-1 size-4 shrink-0 accent-[#e8a15a]"
+            />
+            <span>
+              I agree to the{" "}
+              <Link href="/guidelines" className="text-glare underline-offset-4 hover:underline">
+                Community Guidelines
+              </Link>{" "}
+              and{" "}
+              <Link href="/terms" className="text-glare underline-offset-4 hover:underline">
+                Terms
+              </Link>
+              . I have read the{" "}
+              <Link href="/privacy" className="text-glare underline-offset-4 hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
+        ) : null}
+
+        {needsHuman && turnstileSiteKey ? (
+          <div className="mt-6 space-y-2">
+            <p className="text-sm text-muted">A quick check before the room opens.</p>
+            <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
+          </div>
+        ) : null}
+
+        {error ? <p className="mt-4 text-sm text-ember">{error}</p> : null}
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <button
             type="submit"
-            disabled={!agreed}
+            disabled={!canSubmit}
             className="h-12 rounded-2xl bg-glare px-5 text-sm font-semibold text-[#2a1c0a] transition hover:bg-glare-hot disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Enter {title}
+            {submitting ? "Checking…" : `Enter ${title}`}
           </button>
           <Link
             href="/"

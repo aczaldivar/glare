@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { rejectIfEntryDenied, rejectNonBrowserWrite } from "@/lib/bot-guard";
 import { validateDisplayName } from "@/lib/identity";
 import { isUuid, validateMessageText } from "@/lib/messages";
 import { clientIp, hitRateLimit } from "@/lib/rate-limit";
@@ -9,6 +10,11 @@ import type { ChatMessage } from "@/lib/realtime/types";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const blocked = rejectNonBrowserWrite(request);
+  if (blocked) return blocked;
+  const denied = rejectIfEntryDenied(request);
+  if (denied) return denied;
+
   let body: unknown;
   try {
     body = await request.json();

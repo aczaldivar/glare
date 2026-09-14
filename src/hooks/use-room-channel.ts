@@ -11,6 +11,7 @@ import { colorFromId, type Identity } from "@/lib/identity";
 import type {
   ChatMessage,
   PresenceMember,
+  RealtimeConfig,
   RealtimeProvider,
 } from "@/lib/realtime/types";
 
@@ -83,7 +84,7 @@ export function useRoomChannel(room: string, identity: Identity | null) {
     let cancelled = false;
     fetch("/api/realtime/config")
       .then((res) => res.json())
-      .then((data: { provider?: RealtimeProvider }) => {
+      .then((data: Partial<RealtimeConfig>) => {
         if (!cancelled) setProvider(data.provider ?? "unconfigured");
       })
       .catch(() => {

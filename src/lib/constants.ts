@@ -16,6 +16,14 @@ export const MIN_MESSAGE_INTERVAL_MS = 400;
 export const ABLY_TOKEN_TTL_MS = 10 * 60 * 1000;
 export const TOKEN_RATE_LIMIT_WINDOW_MS = 60_000;
 export const TOKEN_RATE_LIMIT_MAX = 12;
+export const VERIFY_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+export const VERIFY_RATE_LIMIT_MAX = 10;
+export const HUMAN_SESSION_TTL_MS = 4 * 60 * 60 * 1000;
+export const HUMAN_SESSION_COOKIE = "glare_human";
+export const HONEYPOT_FIELD = "company_url";
+export const TURNSTILE_SITEVERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+export const TURNSTILE_MAX_TOKEN_LENGTH = 2048;
 
 export const HISTORY_LIMIT = 80;
 export const PRESENCE_TTL_MS = 45_000;

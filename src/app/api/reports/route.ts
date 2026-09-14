@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { rejectIfEntryDenied, rejectNonBrowserWrite } from "@/lib/bot-guard";
 import { validateDisplayName } from "@/lib/identity";
 import { REPORT_REASONS, type ReportReason } from "@/lib/legal";
 import { isUuid } from "@/lib/messages";
@@ -11,6 +12,11 @@ export const dynamic = "force-dynamic";
 const REASON_IDS = new Set(REPORT_REASONS.map((item) => item.id));
 
 export async function POST(request: NextRequest) {
+  const blocked = rejectNonBrowserWrite(request);
+  if (blocked) return blocked;
+  const denied = rejectIfEntryDenied(request);
+  if (denied) return denied;
+
   let body: unknown;
   try {
     body = await request.json();
