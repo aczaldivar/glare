@@ -87,7 +87,7 @@ export const GUIDELINES: LegalDoc = {
       heading: "Podcast rooms",
       body: [
         "Some rooms are tied to a curated episode. Read the transcript and talk in chat. If you cite a line, quote it from the transcript.",
-        "The same public-room rules apply. This demo is English-only. There is no user audio upload.",
+        "Episodes are official embeds or rights-clear files we ship. The same public-room rules apply. This demo is English-only. There is no user audio or transcript upload.",
       ],
     },
     {
@@ -158,7 +158,7 @@ export const TERMS: LegalDoc = {
     {
       heading: "Podcast rooms (demo)",
       body: [
-        "A podcast room can pair curated audio with a transcript and live chat. v1 ships a demo episode only. There is no user audio or transcript upload.",
+        "A podcast room can pair curated audio with a transcript and live chat. v1 only uses official embeds or rights-clear files we ship (the in-repo demo). There is no user audio or transcript upload.",
         "Do not treat podcast rooms as a public podcast host until these terms and the Privacy Policy are reviewed and patched for that product.",
       ],
     },
@@ -240,7 +240,7 @@ export const PRIVACY: LegalDoc = {
     {
       heading: "Podcast rooms",
       body: [
-        "Demo episodes are static audio and transcript files we ship. v1 does not collect user-uploaded audio or transcripts.",
+        "Demo episodes are static audio and transcript files we ship, or official embeds we add to the catalog. v1 does not collect user-uploaded audio or transcripts.",
         "Chat in a podcast room is the same public chat described above. Patch this policy before treating podcast rooms as a public product.",
       ],
     },

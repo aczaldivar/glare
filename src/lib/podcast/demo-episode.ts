@@ -9,7 +9,7 @@ export const DEMO_EPISODE: PodcastEpisode = {
   title: "Walk In — Glare Room demo",
   description:
     "A short English demo of a podcast room: listen, read the transcript, and talk about the episode in live chat.",
-  audioUrl: "/audio/demo-episode.mp3",
+  media: { kind: "file", src: "/audio/demo-episode.mp3" },
   durationMs: 72_000,
   language: "en",
   transcript: [

@@ -14,6 +14,7 @@ import { useLegalAck } from "@/hooks/use-legal-ack";
 import { useRoomChannel } from "@/hooks/use-room-channel";
 import type { PodcastEpisode, TranscriptCue } from "@/lib/podcast/types";
 import { SAFETY_BANNER } from "@/lib/legal";
+import { curatedFileSrc } from "@/lib/podcast/catalog";
 
 export function PodcastRoomView({ episode }: { episode: PodcastEpisode }) {
   const legal = useLegalAck();
@@ -110,6 +111,8 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
     );
   }
 
+  const fileSrc = curatedFileSrc(episode);
+
   const chat = (
     <EmbeddedChat
       room={episode.roomSlug}
@@ -140,7 +143,9 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 pb-[env(safe-area-inset-bottom)] pt-4 sm:px-6">
-      <audio ref={audioRef} src={episode.audioUrl} preload="metadata" />
+      {fileSrc ? (
+        <audio ref={audioRef} src={fileSrc} preload="metadata" />
+      ) : null}
 
       <header className="panel mb-4 flex flex-col gap-4 rounded-[24px] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <Link href="/" className="shrink-0" aria-label="Back to Glare Room">
@@ -187,7 +192,8 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
 
       <p className="mb-3 px-1 text-xs leading-5 text-ember">{SAFETY_BANNER}</p>
       <p className="mb-4 px-1 text-xs text-muted">
-        Curated demo. No user audio uploads. Quote the transcript to cite a line.
+        Curated episode (rights-clear / in-repo). No user audio or transcript
+        uploads. Quote the transcript to cite a line.
       </p>
 
       <div className="sticky top-2 z-10 mb-4 lg:hidden">

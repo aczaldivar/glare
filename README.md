@@ -150,20 +150,29 @@ A scheduled deletion job against durable storage is **out of scope for v1**. Whe
 
 ## Podcast rooms (demo, not publicly launchable)
 
-A room slug can be tied to a **curated** episode: HTML5 audio (or later an approved embed), a full English transcript, and the same live chat. Chat is the discussion; the transcript is first-class (readable and searchable). Share `/r/{slug}`.
+Counsel constraints for v1:
 
-**Do not treat podcast rooms as a public product until Terms and Privacy are patched for that format.** v1 has no user audio/transcript upload UI. Official / rights-clear / in-repo demo files only.
+- **Official embeds** or **rights-clear / curated transcripts and audio** only
+- **No user audio or transcript uploads**
+- **ToS and Privacy must be patched before a public podcast-rooms launch**
+- **Prefer a demo/curated episode shipped in-repo** (this is what `/r/lobby-ep1` is)
+
+A room slug can be tied to a catalog episode: HTML5 audio from `/audio/`, a full English transcript, and the same live chat. Chat is the discussion; the transcript is first-class (readable and searchable). Share `/r/{slug}`.
+
+**Do not treat podcast rooms as a public product until Terms and Privacy are patched for that format.** There is no upload UI and no open submission path.
 
 Demo: `/r/lobby-ep1` — original English copy plus synthetic tones at `public/audio/demo-episode.mp3` (royalty-free, generated). Transcript lives in `src/lib/podcast/demo-episode.ts` and is sanitized to plain text before render (no raw HTML).
 
-### Add an episode
+### Add an episode (operators only)
 
-1. Put rights-clear audio in `public/audio/` (or use an approved embed URL — then update CSP `frame-src` if needed).
-2. Add a `PodcastEpisode` to the catalog in `src/lib/podcast/catalog.ts` (`roomSlug`, `title`, `audioUrl`, `durationMs`, `language: "en"`, `transcript: TranscriptCue[]`).
-3. Optional `contentWarning` shows a banner.
-4. Quote-to-chat is required for citing a line (Quote on a cue fills the composer).
+Do not add an upload form. Catalog entries only:
 
-English-only in v1. Existing legal gates still apply (13+ notice, Guidelines/Terms ack, mute/block, report).
+1. Prefer a rights-clear file in `public/audio/` (`media: { kind: "file", src: "/audio/…" }`).
+2. Official embeds are allowed as `media: { kind: "official-embed", provider, src }` (https only). v1 playback is wired for in-repo files; embeds need a player + CSP `frame-src` before you ship one.
+3. Add the `PodcastEpisode` to `src/lib/podcast/catalog.ts` with an English `transcript: TranscriptCue[]`.
+4. Optional `contentWarning` shows a banner.
+
+Existing legal gates still apply (13+ notice, Guidelines/Terms ack, mute/block, report).
 
 ## Legal copy (drafts, not counsel)
 
