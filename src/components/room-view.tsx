@@ -3,10 +3,16 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { GlareMark } from "@/components/glare-mark";
+import { RoomGate } from "@/components/room-gate";
+import { SafetyActions } from "@/components/safety-actions";
+import { SiteFooter } from "@/components/site-footer";
 import { useIdentity } from "@/hooks/use-identity";
+import { useLegalAck } from "@/hooks/use-legal-ack";
+import { useLocalModeration } from "@/hooks/use-local-moderation";
 import { useRoomChannel, type ConnectionState } from "@/hooks/use-room-channel";
 import { MAX_MESSAGE_LENGTH, MAX_NAME_LENGTH } from "@/lib/constants";
-import { colorFromId, initialsFromName } from "@/lib/identity";
+import { colorFromId, initialsFromName, type Identity } from "@/lib/identity";
+import { SAFETY_BANNER } from "@/lib/legal";
 import { normalizeMessageText } from "@/lib/messages";
 import type { ChatMessage, PresenceMember } from "@/lib/realtime/types";
 import { roomDisplayName } from "@/lib/rooms";
@@ -26,8 +32,27 @@ function connectionLabel(state: ConnectionState) {
 }
 
 export function RoomView({ room }: { room: string }) {
+  const legal = useLegalAck();
+
+  if (!legal.ready) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center text-muted">
+        Warming the room…
+      </div>
+    );
+  }
+
+  if (!legal.acknowledged) {
+    return <RoomGate room={room} onAccept={legal.acknowledge} />;
+  }
+
+  return <RoomLive room={room} />;
+}
+
+function RoomLive({ room }: { room: string }) {
   const { identity, ready, updateName } = useIdentity();
   const channel = useRoomChannel(room, identity);
+  const moderation = useLocalModeration();
   const [draft, setDraft] = useState("");
   const [sendError, setSendError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -40,11 +65,36 @@ export function RoomView({ room }: { room: string }) {
   const title = roomDisplayName(room);
   const remaining = MAX_MESSAGE_LENGTH - draft.length;
 
+  const visibleMessages = useMemo(
+    () =>
+      channel.messages.filter(
+        (message) =>
+          !moderation.blockedIds.has(message.authorId) &&
+          !moderation.hiddenMessageIds.has(message.id),
+      ),
+    [channel.messages, moderation.blockedIds, moderation.hiddenMessageIds],
+  );
+
+  const people = useMemo(() => {
+    const list = channel.members.length
+      ? channel.members
+      : identity
+        ? [
+            {
+              id: identity.id,
+              name: identity.name,
+              color: colorFromId(identity.id),
+            },
+          ]
+        : [];
+    return list.filter((member) => !moderation.blockedIds.has(member.id));
+  }, [channel.members, identity, moderation.blockedIds]);
+
   useEffect(() => {
     const node = scrollerRef.current;
     if (!node) return;
     node.scrollTo({ top: node.scrollHeight, behavior: "smooth" });
-  }, [channel.messages.length]);
+  }, [visibleMessages.length]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -82,8 +132,6 @@ export function RoomView({ room }: { room: string }) {
       setEditingName(false);
     }
   }
-
-  const people = useMemo(() => channel.members, [channel.members]);
 
   if (!ready || !identity) {
     return (
@@ -137,6 +185,8 @@ export function RoomView({ room }: { room: string }) {
         </div>
       </header>
 
+      <p className="mb-4 px-1 text-xs leading-5 text-ember">{SAFETY_BANNER}</p>
+
       <div className="grid min-h-0 flex-1 gap-4 pb-4 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside
           className={`panel rounded-[24px] p-4 ${peopleOpen ? "block" : "hidden"} lg:block`}
@@ -144,20 +194,26 @@ export function RoomView({ room }: { room: string }) {
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
             In the room
           </p>
-          <ul className="mt-4 space-y-2">
-            {(people.length ? people : [{
-              id: identity.id,
-              name: identity.name,
-              color: colorFromId(identity.id),
-            }]).map((member) => (
+          <ul className="mt-4 space-y-3">
+            {people.map((member) => (
               <li key={member.id}>
                 <PresenceRow
                   member={member}
                   isSelf={member.id === identity.id}
+                  room={room}
+                  identity={identity}
+                  blocked={moderation.isBlocked(member.id)}
+                  onBlock={() => moderation.blockUser(member.id)}
+                  onUnblock={() => moderation.unblockUser(member.id)}
                 />
               </li>
             ))}
           </ul>
+          {moderation.blockedIds.size > 0 ? (
+            <p className="mt-4 text-[11px] text-muted">
+              {moderation.blockedIds.size} hidden locally in this browser.
+            </p>
+          ) : null}
         </aside>
 
         <section className="panel flex min-h-[70dvh] flex-col overflow-hidden rounded-[24px] lg:min-h-0">
@@ -210,7 +266,7 @@ export function RoomView({ room }: { room: string }) {
             className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5"
             aria-live="polite"
           >
-            {channel.messages.length === 0 ? (
+            {visibleMessages.length === 0 ? (
               <div className="flex h-full min-h-[40vh] flex-col items-center justify-center text-center">
                 <p className="font-display text-3xl italic text-ink">
                   The room is quiet.
@@ -221,21 +277,24 @@ export function RoomView({ room }: { room: string }) {
                 </p>
               </div>
             ) : (
-              channel.messages.map((message, index) => (
+              visibleMessages.map((message, index) => (
                 <MessageBubble
                   key={message.id}
                   message={message}
                   isSelf={message.authorId === identity.id}
                   delay={Math.min(index, 8) * 20}
+                  room={room}
+                  identity={identity}
+                  blocked={moderation.isBlocked(message.authorId)}
+                  onHideMessage={() => moderation.hideMessage(message.id)}
+                  onBlock={() => moderation.blockUser(message.authorId)}
+                  onUnblock={() => moderation.unblockUser(message.authorId)}
                 />
               ))
             )}
           </div>
 
-          <form
-            onSubmit={onSend}
-            className="border-t border-line p-3 sm:p-4"
-          >
+          <form onSubmit={onSend} className="border-t border-line p-3 sm:p-4">
             <div className="flex items-end gap-2 rounded-2xl border border-line bg-black/25 p-2 focus-within:border-glare/40 focus-within:shadow-[0_0_0_4px_rgba(255,217,160,0.1)]">
               <input
                 ref={inputRef}
@@ -257,8 +316,11 @@ export function RoomView({ room }: { room: string }) {
                 Send
               </button>
             </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-muted">
-              <span>{sendError ?? "Messages stay in this room. Be decent."}</span>
+            <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-muted">
+              <span>
+                {sendError ??
+                  "500-character cap · rate limited · report harm when you see it."}
+              </span>
               <span className={remaining <= 40 ? "text-ember" : ""}>
                 {remaining}
               </span>
@@ -266,6 +328,8 @@ export function RoomView({ room }: { room: string }) {
           </form>
         </section>
       </div>
+
+      <SiteFooter compact />
     </div>
   );
 }
@@ -273,22 +337,48 @@ export function RoomView({ room }: { room: string }) {
 function PresenceRow({
   member,
   isSelf,
+  room,
+  identity,
+  blocked,
+  onBlock,
+  onUnblock,
 }: {
   member: PresenceMember;
   isSelf: boolean;
+  room: string;
+  identity: Identity;
+  blocked: boolean;
+  onBlock: () => void;
+  onUnblock: () => void;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl px-1 py-1">
+    <div className="flex items-start gap-3 rounded-2xl px-1 py-1">
       <span
-        className="flex size-8 items-center justify-center rounded-full text-[10px] font-semibold text-[#1a1208]"
+        className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-[#1a1208]"
         style={{ background: member.color }}
       >
         {initialsFromName(member.name)}
       </span>
-      <span className="min-w-0 flex-1 truncate text-sm text-ink">
-        {member.name}
-        {isSelf ? <span className="ml-1 text-muted">(you)</span> : null}
-      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm text-ink">
+          {member.name}
+          {isSelf ? <span className="ml-1 text-muted">(you)</span> : null}
+        </p>
+        {!isSelf ? (
+          <div className="mt-1">
+            <SafetyActions
+              room={room}
+              identity={identity}
+              targetType="user"
+              targetId={member.id}
+              targetName={member.name}
+              blocked={blocked}
+              onBlock={onBlock}
+              onUnblock={onUnblock}
+            />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -297,10 +387,22 @@ function MessageBubble({
   message,
   isSelf,
   delay,
+  room,
+  identity,
+  blocked,
+  onHideMessage,
+  onBlock,
+  onUnblock,
 }: {
   message: ChatMessage;
   isSelf: boolean;
   delay: number;
+  room: string;
+  identity: Identity;
+  blocked: boolean;
+  onHideMessage: () => void;
+  onBlock: () => void;
+  onUnblock: () => void;
 }) {
   return (
     <div
@@ -323,6 +425,23 @@ function MessageBubble({
           </time>
         </div>
         <p className="mt-1 whitespace-pre-wrap text-sm leading-6">{message.text}</p>
+        {!isSelf ? (
+          <div className="mt-2">
+            <SafetyActions
+              room={room}
+              identity={identity}
+              targetType="message"
+              targetId={message.authorId}
+              targetName={message.authorName}
+              messageId={message.id}
+              messageText={message.text}
+              blocked={blocked}
+              onHideMessage={onHideMessage}
+              onBlock={onBlock}
+              onUnblock={onUnblock}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

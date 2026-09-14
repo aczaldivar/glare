@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GlareMark } from "@/components/glare-mark";
+import { SiteFooter } from "@/components/site-footer";
 
 export default function NotFound() {
   return (
@@ -18,6 +19,9 @@ export default function NotFound() {
       >
         Back to Glare Room
       </Link>
+      <div className="mt-10 w-full">
+        <SiteFooter compact />
+      </div>
     </div>
   );
 }

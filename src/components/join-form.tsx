@@ -1,16 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
+import { useLegalAck } from "@/hooks/use-legal-ack";
 import { isValidRoomSlug, roomPath, slugifyRoom } from "@/lib/rooms";
 
 export function JoinForm() {
   const router = useRouter();
+  const legal = useLegalAck();
   const [value, setValue] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const slug = useMemo(() => slugifyRoom(value || "lobby"), [value]);
   const valid = isValidRoomSlug(slug);
+  const needsAck = legal.ready && !legal.acknowledged;
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -19,6 +24,11 @@ export function JoinForm() {
       setError("Use 2–32 letters, numbers, or hyphens. Start with a letter.");
       return;
     }
+    if (needsAck && !agreed) {
+      setError("Agree to the Community Guidelines and Terms to enter a room.");
+      return;
+    }
+    if (needsAck) legal.acknowledge();
     setError(null);
     router.push(roomPath(next));
   }
@@ -59,6 +69,30 @@ export function JoinForm() {
           <span className="text-ember">That name cannot be used.</span>
         )}
       </p>
+      {needsAck ? (
+        <label className="flex items-start gap-3 text-sm leading-6 text-muted">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(event) => {
+              setAgreed(event.target.checked);
+              if (error) setError(null);
+            }}
+            className="mt-1 size-4 shrink-0 accent-[#e8a15a]"
+          />
+          <span>
+            I agree to the{" "}
+            <Link href="/guidelines" className="text-glare underline-offset-4 hover:underline">
+              Community Guidelines
+            </Link>{" "}
+            and{" "}
+            <Link href="/terms" className="text-glare underline-offset-4 hover:underline">
+              Terms
+            </Link>
+            .
+          </span>
+        </label>
+      ) : null}
       {error ? <p className="text-sm text-ember">{error}</p> : null}
     </form>
   );

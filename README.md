@@ -15,7 +15,8 @@ Walk in → name or join a room → talk live → share the room link.
 - **Real-time messages** and **presence** (who is in the room)
 - Shareable room URLs and Open Graph previews
 - Mobile-friendly, product-ready UI
-- Basics of moderation: 500-character messages, burst rate limits, plain-text only
+- Safety basics: Community Guidelines / Terms acknowledgment before entering a room, 500-character messages, burst rate limits, plain-text only, in-app report, local hide/block
+- In-app **Terms**, **Privacy**, and **Community Guidelines** (plain-language product drafts)
 
 Featured room to share: `/r/lobby`.
 
@@ -87,7 +88,8 @@ You do **not** put the root key in the browser. The app mints short-lived tokens
    - If it is not, click **Add Domain** and enter `glareroom.vercel.app`
    - If that name is already taken on Vercel, add the closest available name (`glare-room.vercel.app`, `glareroom-app.vercel.app`, or a custom domain) and set `NEXT_PUBLIC_SITE_URL` to match
 7. Deploy. Vercel builds on every push to the production branch.
-8. Smoke-test: open the site → **Open lobby** (or create a room) → send a message in two browser windows → **Share link**.
+8. **Review legal copy** before you feature the URL publicly. `/guidelines`, `/terms`, and `/privacy` are product drafts, not lawyer-reviewed documents. Replace or edit them, decide a real contact/report email, and bump `LEGAL_ACK_VERSION` in `src/lib/legal.ts` if the agreement materially changes (that re-prompts people before they enter a room).
+9. Smoke-test: open the site → agree to Guidelines/Terms → **Open lobby** (or create a room) → send a message in two browser windows → **Share link** → **Report** on a message.
 
 Redeploy after changing env vars so `NEXT_PUBLIC_SITE_URL` is baked into the client bundle.
 
@@ -100,15 +102,24 @@ In **Settings → Domains**, add something like `glareroom.com`, follow DNS inst
 - Rooms are public. Anyone with the link can read and write.
 - Display names are not unique logins.
 - Rate limit: 8 messages / 10 seconds per IP and room, plus a short minimum interval.
+- Reports are stored in server memory (and logged) so an operator can see them; they are not a full moderation console.
+- Hide/block is local to the browser.
 - Do not treat this as a private messenger.
+
+## Legal copy (drafts, not counsel)
+
+The Terms of Service, Privacy Policy, and Community Guidelines in this repo are **plain-language product drafts** written so Anna can ship a public URL with a visible safety layer. They are **not formal legal advice** and have not been reviewed by an attorney.
+
+Before a public launch, review and revise `/terms`, `/privacy`, and `/guidelines`, confirm they match how you actually host and log data, and add an operator contact if you have one. Changing the acknowledgment version in `src/lib/legal.ts` will ask returning visitors to agree again.
 
 ## Project layout
 
 ```
-src/app/                Landing, room routes, metadata, API
+src/app/                Landing, legal pages, room routes, metadata, API
 src/app/r/[room]        Shareable room URLs
 src/app/api/realtime    Config, Ably tokens, messages, local SSE/presence
-src/components          Landing + room UI
-src/hooks               Identity + realtime client
-src/lib                 Validation, rate limit, providers
+src/app/api/reports     Abuse report intake
+src/components          Landing, room, legal, safety UI
+src/hooks               Identity, realtime, legal ack, local hide/block
+src/lib                 Validation, rate limit, legal copy, providers
 ```

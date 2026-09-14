@@ -2,7 +2,9 @@ import Link from "next/link";
 import { JoinForm } from "@/components/join-form";
 import { GlareMark } from "@/components/glare-mark";
 import { RoomPreview } from "@/components/room-preview";
+import { SiteFooter } from "@/components/site-footer";
 import { SUGGESTED_ROOMS } from "@/lib/constants";
+import { SAFETY_BANNER } from "@/lib/legal";
 import { roomPath } from "@/lib/rooms";
 
 export default function Home() {
@@ -29,7 +31,8 @@ export default function Home() {
           </h1>
           <p className="mt-5 max-w-lg text-base leading-7 text-muted sm:text-lg">
             Glare Room is a public chatroom for the open internet. No accounts.
-            Create a room — or join one by name — and share the link.
+            Create a room — or join one by name — and share the link. No
+            illegal content. We may remove rooms.
           </p>
 
           <div className="panel mt-8 rounded-[28px] p-5 sm:p-6">
@@ -46,6 +49,7 @@ export default function Home() {
                 </Link>
               ))}
             </div>
+            <p className="mt-5 text-xs leading-5 text-ember">{SAFETY_BANNER}</p>
           </div>
 
           <dl className="mt-8 grid gap-4 text-sm text-muted sm:grid-cols-3">
@@ -73,10 +77,7 @@ export default function Home() {
         <RoomPreview />
       </main>
 
-      <footer className="flex flex-col gap-2 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>Be decent. Rooms are public. Messages are ephemeral.</p>
-        <p>Glareroom · made to be featured live.</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

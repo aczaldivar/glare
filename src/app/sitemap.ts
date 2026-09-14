@@ -5,5 +5,8 @@ export default function sitemap() {
   return [
     { url: site, lastModified: new Date() },
     { url: `${site}/r/lobby`, lastModified: new Date() },
+    { url: `${site}/guidelines`, lastModified: new Date() },
+    { url: `${site}/terms`, lastModified: new Date() },
+    { url: `${site}/privacy`, lastModified: new Date() },
   ];
 }

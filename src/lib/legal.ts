@@ -1,0 +1,216 @@
+export const LEGAL_ACK_VERSION = 1;
+export const LEGAL_ACK_STORAGE_KEY = "glare.legal.ack.v1";
+export const LEGAL_ACK_EVENT = "glare-legal-ack";
+export const BLOCKS_STORAGE_KEY = "glare.blocks.v1";
+export const BLOCKS_EVENT = "glare-blocks";
+export const HIDDEN_MESSAGES_STORAGE_KEY = "glare.hidden-messages.v1";
+export const HIDDEN_MESSAGES_EVENT = "glare-hidden-messages";
+
+export const LEGAL_EFFECTIVE_DATE = "September 14, 2026";
+
+export const LEGAL_DRAFT_DISCLAIMER =
+  "This is a product draft written for Glare Room, not formal legal advice. Review it with counsel before a public launch and replace anything that does not match how you actually operate the service.";
+
+export const SAFETY_BANNER =
+  "No illegal content. Harassment, exploitation, and abuse are not allowed. We may hide messages, remove rooms, or block access.";
+
+export const REPORT_REASONS = [
+  { id: "spam", label: "Spam or flooding" },
+  { id: "harassment", label: "Harassment or hate" },
+  { id: "illegal", label: "Illegal or dangerous content" },
+  { id: "other", label: "Something else" },
+] as const;
+
+export type ReportReason = (typeof REPORT_REASONS)[number]["id"];
+
+export type LegalDoc = {
+  slug: "guidelines" | "terms" | "privacy";
+  title: string;
+  kicker: string;
+  summary: string;
+  sections: { heading: string; body: string[] }[];
+};
+
+export const GUIDELINES: LegalDoc = {
+  slug: "guidelines",
+  title: "Community Guidelines",
+  kicker: "How to stay in the room",
+  summary:
+    "Glare Room is public. Anyone with a link can walk in. These rules are the short version of how we expect people to behave, and why we may remove messages or rooms.",
+  sections: [
+    {
+      heading: "Be a person in the room",
+      body: [
+        "Talk like you would in a public space with strangers. Display names are optional and are not verified accounts.",
+        "Do not impersonate someone else in a way that is meant to deceive or harm.",
+      ],
+    },
+    {
+      heading: "No illegal content",
+      body: [
+        "Do not post, request, or link to illegal content. That includes child sexual abuse material, exploitation, trafficking, credible threats of violence, and anything else that is unlawful where the service is offered.",
+        "We may remove rooms, drop messages, and report apparent illegal activity to the appropriate authorities when we believe we must.",
+      ],
+    },
+    {
+      heading: "No harassment, hate, or abuse",
+      body: [
+        "Do not target people with slurs, stalking, sexual harassment, or piles of hostile messages.",
+        "Do not share someone’s private information (addresses, phone numbers, IDs, intimate images) without their clear consent.",
+      ],
+    },
+    {
+      heading: "No spam or disruption",
+      body: [
+        "Do not flood a room, run bots that drown out conversation, or use the service only to scrape or dump ads.",
+        "Messages are capped in length and rate-limited. Trying to evade those limits is itself a violation.",
+      ],
+    },
+    {
+      heading: "Rooms are public and may disappear",
+      body: [
+        "A room name is not a private club. If you share the link, assume anyone can read it.",
+        "We may close, rename, or refuse rooms that are used for harm, including rooms whose names themselves violate these guidelines.",
+      ],
+    },
+    {
+      heading: "If something is wrong",
+      body: [
+        "Use Report on a message or person. That logs a report for the operator. You can also hide a person locally in your browser.",
+        "Reporting is not a substitute for contacting law enforcement if someone is in immediate danger.",
+      ],
+    },
+  ],
+};
+
+export const TERMS: LegalDoc = {
+  slug: "terms",
+  title: "Terms of Service",
+  kicker: "The house rules for using Glare Room",
+  summary:
+    "By using Glare Room you agree to these terms. If you do not agree, do not enter a room. This draft is meant to be readable. It is not a substitute for a lawyer-reviewed contract.",
+  sections: [
+    {
+      heading: "The service",
+      body: [
+        "Glare Room is a public, real-time chat product. You can create or join rooms by name, choose an optional display name, and share a link.",
+        "There are no accounts in this version. Your browser stores a guest identity, your legal acknowledgment, and any people you have hidden.",
+      ],
+    },
+    {
+      heading: "Eligibility and acceptable use",
+      body: [
+        "You must be old enough to use an unaccounted public chat service in your country, and you must not use Glare Room if applicable law forbids it.",
+        "You agree to follow the Community Guidelines. You will not post illegal content, abuse others, attempt to break the service, or use it to operate malware, scams, or unauthorized access to systems.",
+      ],
+    },
+    {
+      heading: "Public rooms, not private messages",
+      body: [
+        "Do not treat Glare Room as a confidential messenger. Messages may be visible to anyone who joins the room, to operators, and to the infrastructure that delivers realtime events.",
+        "Messages are intended to be ephemeral. They are not a durable archive, and we do not promise that history will be kept or that it will be deleted on a particular schedule.",
+      ],
+    },
+    {
+      heading: "Moderation and removal",
+      body: [
+        "We may refuse, rate-limit, hide, or remove messages, names, or rooms. We may block access when we believe these terms or the law require it.",
+        "We do not have to give advance notice, and we are not obligated to restore a room. Automated limits (length and send rate) are part of this.",
+      ],
+    },
+    {
+      heading: "Your content",
+      body: [
+        "You keep whatever rights you have in the words you type. You grant us a limited license to transmit, display, and store them as needed to run the chat, moderate it, and handle reports.",
+        "You are responsible for what you send. Do not submit content you do not have the right to share.",
+      ],
+    },
+    {
+      heading: "The service is provided as-is",
+      body: [
+        "Glare Room is offered without warranties of any kind, to the fullest extent the law allows. Rooms can go down, messages can be lost, and realtime delivery can fail.",
+        "To the fullest extent allowed by law, we are not liable for indirect, incidental, or consequential damages, or for disputes between people in a room.",
+      ],
+    },
+    {
+      heading: "Changes",
+      body: [
+        "We may update these terms as the product changes. If we make a material change, we may ask you to acknowledge the new version before entering a room again.",
+        "If a court finds a part of these terms unenforceable, the rest still applies.",
+      ],
+    },
+  ],
+};
+
+export const PRIVACY: LegalDoc = {
+  slug: "privacy",
+  title: "Privacy Policy",
+  kicker: "What this version actually stores",
+  summary:
+    "Glare Room v1 does not ask you to create an account. This draft describes the information that typically exists when you use the app, so you can decide whether to walk in.",
+  sections: [
+    {
+      heading: "What we collect in this version",
+      body: [
+        "Guest identity: a random id and optional display name stored in your browser (localStorage).",
+        "Messages you send: transmitted to others in the room through our realtime path. They are not written to a product database in v1.",
+        "Technical data that comes with any web request, such as IP address, user agent, and timestamps, which we may see in server logs.",
+        "Reports you submit: room, target, optional reason, and your guest id, stored so an operator can review them.",
+        "Legal acknowledgment: a flag in your browser that you agreed to the Community Guidelines and Terms.",
+      ],
+    },
+    {
+      heading: "What stays on your device",
+      body: [
+        "Display name, guest id, people you have hidden, messages you have hidden, and the legal acknowledgment live in localStorage on this browser.",
+        "Clearing site data in your browser removes that local state. It does not unsay messages already seen by other people in a room.",
+      ],
+    },
+    {
+      heading: "Processors",
+      body: [
+        "The site may be hosted on Vercel. Realtime delivery in production uses Ably. Those providers process data according to their own terms in order to host and transmit the service.",
+        "We do not sell your personal information. We do not run advertising trackers in this version.",
+      ],
+    },
+    {
+      heading: "Why we use this information",
+      body: [
+        "To operate public chat: deliver messages, show who is in a room, enforce length and rate limits, and keep basic safety tools working.",
+        "To review reports and respond to abuse or legal requests when we have a good-faith reason to do so.",
+      ],
+    },
+    {
+      heading: "How long it lasts",
+      body: [
+        "Chat history is ephemeral by design. Local in-memory data is gone when the process restarts. Production rewind, if enabled by the realtime provider, is short-lived.",
+        "Reports and server logs last only as long as the operator keeps them. In this draft they are not a permanent case-management system.",
+      ],
+    },
+    {
+      heading: "Your choices",
+      body: [
+        "Do not enter a room if you do not want to be in a public conversation.",
+        "Change or clear your display name, hide people locally, and stop using the site. Because there is no account, we cannot offer a global “delete my profile” button that reaches other people’s screens.",
+      ],
+    },
+    {
+      heading: "Children",
+      body: [
+        "Glare Room is not directed at children. Do not use it to share information about minors or to contact them. We will remove apparent child sexual abuse material and related exploitation without notice.",
+      ],
+    },
+    {
+      heading: "Contact",
+      body: [
+        "Until an operator publishes a dedicated contact address, treat reports submitted in-app as the primary way to flag abuse on this instance.",
+      ],
+    },
+  ],
+};
+
+export const LEGAL_DOCS: LegalDoc[] = [GUIDELINES, TERMS, PRIVACY];
+
+export function legalPath(slug: LegalDoc["slug"]) {
+  return `/${slug}`;
+}

@@ -38,6 +38,12 @@ export const RESERVED_ROOM_SLUGS = new Set([
   "next",
   "null",
   "undefined",
+  "terms",
+  "privacy",
+  "guidelines",
+  "legal",
+  "community",
+  "reports",
 ]);
 
 export function getSiteUrl() {

@@ -15,6 +15,9 @@ test("isValidRoomSlug accepts public room names", () => {
   assert.equal(isValidRoomSlug("hi"), true);
   assert.equal(isValidRoomSlug("a"), false);
   assert.equal(isValidRoomSlug("api"), false);
+  assert.equal(isValidRoomSlug("terms"), false);
+  assert.equal(isValidRoomSlug("privacy"), false);
+  assert.equal(isValidRoomSlug("guidelines"), false);
   assert.equal(isValidRoomSlug("-lobby"), false);
   assert.equal(isValidRoomSlug("after--hours"), false);
 });
