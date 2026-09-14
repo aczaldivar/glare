@@ -135,6 +135,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       emptyBody="Quote a transcript line if you are citing it. Anyone with the link can walk in."
       emptyHint="Public room. Be decent with the people who walk in."
       placeholder="Quote a line, then add your take"
+      helperText="Quote the transcript to cite a line. Public room — be decent."
       onShare={shareRoom}
       copied={copied}
     />

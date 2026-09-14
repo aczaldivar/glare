@@ -29,6 +29,7 @@ export function EmbeddedChat({
   emptyBody = "Say something. Anyone with the link can walk in — no account required.",
   emptyHint = "Public room. Be decent with the people who walk in.",
   placeholder = "Write to the room",
+  helperText = "500-character cap · rate limited · report harm when you see it.",
   onShare,
   copied = false,
 }: {
@@ -43,6 +44,7 @@ export function EmbeddedChat({
   emptyBody?: string;
   emptyHint?: string;
   placeholder?: string;
+  helperText?: string;
   onShare?: () => void;
   copied?: boolean;
 }) {
@@ -176,7 +178,7 @@ export function EmbeddedChat({
               (connection === "offline"
                 ? notice ??
                   "You're offline. Messages will send when the room is live again."
-                : "500-character cap · rate limited · report harm when you see it.")}
+                : helperText)}
           </span>
           {remaining <= 50 ? (
             <span className={remaining <= 40 ? "text-ember" : ""}>{remaining}</span>

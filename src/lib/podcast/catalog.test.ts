@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { getPodcastEpisode } from "./catalog";
+import { getPodcastEpisode, prepareCatalogEpisode } from "./catalog";
+import { DEMO_EPISODE } from "./demo-episode";
 import { sanitizeTranscriptText } from "./sanitize";
 import { isCuratedAudioPath } from "./types";
 
@@ -34,7 +35,58 @@ test("demo audio file is shipped in public/audio", () => {
 
 test("content warnings are sanitized as plain text", () => {
   assert.equal(
-    sanitizeTranscriptText('Flash <b>strobe</b> <script>x</script>'),
+    sanitizeTranscriptText("Flash <b>strobe</b> <script>x</script>"),
     "Flash strobe",
+  );
+  const prepared = prepareCatalogEpisode({
+    ...DEMO_EPISODE,
+    contentWarning: "Strobe <b>lights</b>",
+  });
+  assert.equal(prepared?.contentWarning, "Strobe lights");
+});
+
+test("official https embeds with an in-repo transcript are allowed", () => {
+  const prepared = prepareCatalogEpisode({
+    ...DEMO_EPISODE,
+    roomSlug: "embed-demo",
+    media: {
+      kind: "official-embed",
+      provider: "example",
+      src: "https://example.com/embed/1",
+    },
+    audioUrl: "https://example.com/embed/1",
+  });
+  assert.ok(prepared);
+  assert.equal(prepared?.media.kind, "official-embed");
+  assert.equal(prepared?.audioUrl, "https://example.com/embed/1");
+});
+
+test("http embeds, upload paths, and empty transcripts are rejected", () => {
+  assert.equal(
+    prepareCatalogEpisode({
+      ...DEMO_EPISODE,
+      media: {
+        kind: "official-embed",
+        provider: "x",
+        src: "http://example.com/e",
+      },
+      audioUrl: "http://example.com/e",
+    }),
+    null,
+  );
+  assert.equal(
+    prepareCatalogEpisode({
+      ...DEMO_EPISODE,
+      media: { kind: "file", src: "/uploads/user.mp3" },
+      audioUrl: "/uploads/user.mp3",
+    }),
+    null,
+  );
+  assert.equal(
+    prepareCatalogEpisode({
+      ...DEMO_EPISODE,
+      transcript: [],
+    }),
+    null,
   );
 });
