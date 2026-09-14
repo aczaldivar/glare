@@ -58,8 +58,21 @@ See `.env.example`.
 | --- | --- | --- |
 | `ABLY_API_KEY` | Production (Vercel) | Ably app API key with publish, subscribe, and presence |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical URL for metadata and share previews. Local: `http://localhost:3000`. Live: `https://glareroom.vercel.app` |
-| `OPERATOR_CONTACT_EMAIL` | Optional placeholder | Operator inbox shown in the footer and Privacy Contact section. Leave empty until you have a real address. |
+| `OPERATOR_CONTACT_EMAIL` | Optional placeholder | Operator inbox shown in the footer and Privacy Contact section. Leave empty until you have a real address. Do not invent one in the repo. |
 | `NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL` | Optional | Same as above if you want to set the public value explicitly. If omitted, `OPERATOR_CONTACT_EMAIL` is copied into the client bundle at build time. |
+
+### Operator contact (Anna, before launch)
+
+The repo does not include a real support address. `OPERATOR_CONTACT_EMAIL` stays blank on purpose.
+
+Before a public launch, Anna should:
+
+1. Choose the real operator inbox (whatever address will actually be read).
+2. In Vercel: **Project → Settings → Environment Variables**, add `OPERATOR_CONTACT_EMAIL` for Production (and Preview if you want it on preview URLs).
+3. Optionally put the same value in `.env.local` to check the footer and Privacy Contact section locally.
+4. Redeploy. The footer and Privacy page then show that address.
+
+Until that variable is set, the UI tells operators to set `OPERATOR_CONTACT_EMAIL`. In-room **Report** still works.
 
 The app chooses a realtime provider automatically:
 
