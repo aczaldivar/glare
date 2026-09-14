@@ -133,7 +133,7 @@ export function TranscriptPanel({
                       type="button"
                       onClick={() => onQuote(cue)}
                       aria-label="Quote this line in chat"
-                      className="inline-flex h-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-[11px] text-glare underline-offset-4 hover:underline"
+                      className="inline-flex h-11 min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-line text-[11px] text-glare hover:border-glare/50"
                     >
                       Quote
                     </button>
