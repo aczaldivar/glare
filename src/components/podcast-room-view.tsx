@@ -134,6 +134,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       emptyTitle="Talk about the episode."
       emptyBody="Quote a transcript line if you are citing it. Anyone with the link can walk in."
       emptyHint="Public room. Be decent with the people who walk in."
+      placeholder="Quote a line, then add your take"
       onShare={shareRoom}
       copied={copied}
     />
@@ -192,7 +193,10 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       </header>
 
       {episode.contentWarning ? (
-        <p className="mb-3 rounded-2xl border border-ember/40 bg-ember/10 px-4 py-3 text-sm text-ember">
+        <p
+          role="status"
+          className="mb-3 rounded-2xl border border-ember/40 bg-ember/10 px-4 py-3 text-sm text-ember"
+        >
           Content warning: {episode.contentWarning}
         </p>
       ) : null}
@@ -209,6 +213,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           currentMs={currentMs}
           playing={playing}
           compact
+          disabled={!fileSrc}
           onToggle={onToggle}
           onSeek={onSeek}
         />
@@ -218,6 +223,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           episode={episode}
           currentMs={currentMs}
           playing={playing}
+          disabled={!fileSrc}
           onToggle={onToggle}
           onSeek={onSeek}
         />

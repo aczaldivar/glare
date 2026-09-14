@@ -161,7 +161,9 @@ A room slug can be tied to a catalog episode: HTML5 audio from `/audio/`, a full
 
 **Do not treat podcast rooms as a public product until Terms and Privacy are patched for that format.** There is no upload UI and no open submission path.
 
-Demo: `/r/lobby-ep1` — original English copy plus synthetic tones at `public/audio/demo-episode.mp3` (royalty-free, generated). Transcript lives in `src/lib/podcast/demo-episode.ts` and is sanitized to plain text before render (no raw HTML).
+Demo: catalog episode `lobby-ep1` + `public/audio/demo-episode.mp3` (royalty-free generated tones) + in-repo transcript in `src/lib/podcast/demo-episode.ts`. Transcript is sanitized to plain text before render (no raw HTML). An approved official embed plus in-repo transcript is the other allowed demo shape; v1 playback is wired for files.
+
+Ethics UX in the room: **Quote** puts a transcript line into chat (required for citing); empty chat has a light civility nudge (not a filter); optional `contentWarning` on the episode shows a banner.
 
 ### Add an episode (operators only)
 

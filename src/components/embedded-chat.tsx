@@ -28,6 +28,7 @@ export function EmbeddedChat({
   emptyTitle = "The room is quiet.",
   emptyBody = "Say something. Anyone with the link can walk in — no account required.",
   emptyHint = "Public room. Be decent with the people who walk in.",
+  placeholder = "Write to the room",
   onShare,
   copied = false,
 }: {
@@ -41,6 +42,7 @@ export function EmbeddedChat({
   emptyTitle?: string;
   emptyBody?: string;
   emptyHint?: string;
+  placeholder?: string;
   onShare?: () => void;
   copied?: boolean;
 }) {
@@ -72,6 +74,11 @@ export function EmbeddedChat({
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    if (appliedQuoteId == null) return;
+    inputRef.current?.focus();
+  }, [appliedQuoteId]);
 
   if (quoteSeed && quoteSeed.id !== appliedQuoteId) {
     setAppliedQuoteId(quoteSeed.id);
@@ -150,7 +157,7 @@ export function EmbeddedChat({
               setDraft(event.target.value.slice(0, MAX_MESSAGE_LENGTH));
               if (sendError) setSendError(null);
             }}
-            placeholder="Write to the room"
+            placeholder={placeholder}
             maxLength={MAX_MESSAGE_LENGTH}
             disabled={connection === "offline"}
             className="h-11 min-h-11 flex-1 bg-transparent px-3 text-sm text-ink outline-none placeholder:text-muted disabled:opacity-50"

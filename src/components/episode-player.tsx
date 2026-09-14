@@ -15,6 +15,7 @@ export function EpisodePlayer({
   currentMs,
   playing,
   compact = false,
+  disabled = false,
   onToggle,
   onSeek,
 }: {
@@ -22,6 +23,7 @@ export function EpisodePlayer({
   currentMs: number;
   playing: boolean;
   compact?: boolean;
+  disabled?: boolean;
   onToggle: () => void;
   onSeek: (ms: number) => void;
 }) {
@@ -40,7 +42,8 @@ export function EpisodePlayer({
         <button
           type="button"
           onClick={onToggle}
-          className="inline-flex h-11 min-h-11 min-w-14 shrink-0 items-center justify-center rounded-full bg-glare px-3 text-xs font-semibold text-[#2a1c0a]"
+          disabled={disabled}
+          className="inline-flex h-11 min-h-11 min-w-14 shrink-0 items-center justify-center rounded-full bg-glare px-3 text-xs font-semibold text-[#2a1c0a] disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={playing ? "Pause episode" : "Play episode"}
         >
           {playing ? "Pause" : "Play"}
@@ -73,10 +76,17 @@ export function EpisodePlayer({
           step={250}
           defaultValue={0}
           aria-valuetext={`${formatClock(currentMs)} of ${formatClock(episode.durationMs)}`}
+          disabled={disabled}
           onChange={(event) => onSeek(Number(event.target.value))}
-          className="h-2 w-full cursor-pointer accent-[#e8a15a]"
+          className="h-2 w-full cursor-pointer accent-[#e8a15a] disabled:cursor-not-allowed"
         />
       </label>
+      {disabled ? (
+        <p className="mt-2 text-xs text-muted">
+          Playback is for curated in-repo files. Official embeds are catalog-only
+          until a player is wired.
+        </p>
+      ) : null}
     </div>
   );
 }

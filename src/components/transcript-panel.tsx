@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { activeCueId as cueIdAtTime } from "@/lib/podcast/cues";
 import type { TranscriptCue } from "@/lib/podcast/types";
 
 function formatClock(ms: number) {
@@ -29,12 +30,10 @@ export function TranscriptPanel({
   const activeRef = useRef<HTMLLIElement | null>(null);
   const ignoreScroll = useRef(false);
 
-  const activeId = useMemo(() => {
-    const match = cues.find(
-      (cue) => currentMs >= cue.startMs && currentMs < cue.endMs,
-    );
-    return match?.id ?? cues[cues.length - 1]?.id ?? null;
-  }, [cues, currentMs]);
+  const activeId = useMemo(
+    () => cueIdAtTime(cues, currentMs),
+    [cues, currentMs],
+  );
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -119,6 +118,7 @@ export function TranscriptPanel({
                         onFollow(true);
                         onSeek(cue.startMs);
                       }}
+                      aria-label={`Seek to ${formatClock(cue.startMs)}`}
                       className="min-w-0 flex-1 text-left"
                     >
                       <p className="font-mono text-[10px] text-muted">
@@ -129,6 +129,7 @@ export function TranscriptPanel({
                     <button
                       type="button"
                       onClick={() => onQuote(cue)}
+                      aria-label="Quote this line in chat"
                       className="mt-1 shrink-0 text-[11px] text-glare underline-offset-4 hover:underline"
                     >
                       Quote

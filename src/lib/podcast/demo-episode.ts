@@ -13,6 +13,7 @@ export const DEMO_EPISODE: PodcastEpisode = {
   audioUrl: "/audio/demo-episode.mp3",
   durationMs: 72_000,
   language: "en",
+  // Optional contentWarning renders a banner. Demo has none.
   transcript: [
     {
       id: "c1",
