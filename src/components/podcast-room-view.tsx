@@ -48,6 +48,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
   const [mobileTab, setMobileTab] = useState<"transcript" | "chat">("transcript");
+  const fileSrc = curatedFileSrc(episode);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -65,7 +66,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("ended", onPause);
     };
-  }, [ready]);
+  }, [fileSrc]);
 
   function onToggle() {
     const audio = audioRef.current;
@@ -103,15 +104,23 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
     if (result.ok) setEditingName(false);
   }
 
+  const audioEl = fileSrc ? (
+    <audio
+      ref={audioRef}
+      src={fileSrc}
+      preload="metadata"
+      aria-label={episode.title}
+    />
+  ) : null;
+
   if (!ready || !identity) {
     return (
       <div className="flex min-h-dvh items-center justify-center text-muted">
+        {audioEl}
         Warming the room…
       </div>
     );
   }
-
-  const fileSrc = curatedFileSrc(episode);
 
   const chat = (
     <EmbeddedChat
@@ -143,9 +152,7 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 pb-[env(safe-area-inset-bottom)] pt-4 sm:px-6">
-      {fileSrc ? (
-        <audio ref={audioRef} src={fileSrc} preload="metadata" />
-      ) : null}
+      {audioEl}
 
       <header className="panel mb-4 flex flex-col gap-4 rounded-[24px] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <Link href="/" className="shrink-0" aria-label="Back to Glare Room">
@@ -216,9 +223,17 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
         />
       </div>
 
-      <div className="mb-3 flex gap-2 lg:hidden">
+      <div
+        className="mb-3 flex gap-2 lg:hidden"
+        role="tablist"
+        aria-label="Episode views"
+      >
         <button
           type="button"
+          role="tab"
+          id="podcast-tab-transcript"
+          aria-controls="podcast-panel-transcript"
+          aria-selected={mobileTab === "transcript"}
           onClick={() => setMobileTab("transcript")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "transcript"
@@ -230,6 +245,10 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
         </button>
         <button
           type="button"
+          role="tab"
+          id="podcast-tab-chat"
+          aria-controls="podcast-panel-chat"
+          aria-selected={mobileTab === "chat"}
           onClick={() => setMobileTab("chat")}
           className={`min-h-11 flex-1 rounded-full border px-4 text-sm ${
             mobileTab === "chat"
@@ -243,6 +262,9 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
 
       <div className="grid min-h-0 flex-1 gap-4 pb-4 lg:grid-cols-2">
         <div
+          id="podcast-panel-transcript"
+          role="tabpanel"
+          aria-labelledby="podcast-tab-transcript"
           className={`min-h-[50dvh] flex-col ${
             mobileTab === "transcript" ? "flex" : "hidden"
           } lg:flex`}
@@ -250,6 +272,9 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
           {transcript}
         </div>
         <div
+          id="podcast-panel-chat"
+          role="tabpanel"
+          aria-labelledby="podcast-tab-chat"
           className={`min-h-[50dvh] flex-col ${
             mobileTab === "chat" ? "flex" : "hidden"
           } lg:flex`}

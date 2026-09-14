@@ -29,6 +29,8 @@ export type PodcastEpisode = {
   title: string;
   description: string;
   media: PodcastMedia;
+  /** File path or official-embed URL. Kept in sync with `media.src` (Pixel catalog field). */
+  audioUrl: string;
   durationMs: number;
   language: "en";
   contentWarning?: string;

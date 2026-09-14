@@ -72,6 +72,7 @@ export function EpisodePlayer({
           max={episode.durationMs}
           step={250}
           defaultValue={0}
+          aria-valuetext={`${formatClock(currentMs)} of ${formatClock(episode.durationMs)}`}
           onChange={(event) => onSeek(Number(event.target.value))}
           className="h-2 w-full cursor-pointer accent-[#e8a15a]"
         />

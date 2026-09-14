@@ -32,6 +32,7 @@ function sanitizeEpisode(episode: PodcastEpisode): PodcastEpisode | null {
   if (!isAllowedMedia(episode)) return null;
   return {
     ...episode,
+    audioUrl: episode.media.src,
     title: sanitizeTranscriptText(episode.title),
     description: sanitizeTranscriptText(episode.description),
     contentWarning: episode.contentWarning

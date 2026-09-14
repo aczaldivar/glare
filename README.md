@@ -169,7 +169,7 @@ Do not add an upload form. Catalog entries only:
 
 1. Prefer a rights-clear file in `public/audio/` (`media: { kind: "file", src: "/audio/…" }`).
 2. Official embeds are allowed as `media: { kind: "official-embed", provider, src }` (https only). v1 playback is wired for in-repo files; embeds need a player + CSP `frame-src` before you ship one.
-3. Add the `PodcastEpisode` to `src/lib/podcast/catalog.ts` with an English `transcript: TranscriptCue[]`.
+3. Add the `PodcastEpisode` to `src/lib/podcast/catalog.ts` (`roomSlug`, `title`, `audioUrl`, `durationMs`, `transcript: TranscriptCue[]`). `audioUrl` mirrors `media.src`.
 4. Optional `contentWarning` shows a banner.
 
 Existing legal gates still apply (13+ notice, Guidelines/Terms ack, mute/block, report).

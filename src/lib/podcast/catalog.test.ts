@@ -1,5 +1,5 @@
 import { getPodcastEpisode } from "./catalog";
-import { curatedFileSrc, isCuratedAudioPath } from "./types";
+import { isCuratedAudioPath } from "./types";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -8,8 +8,7 @@ test("demo podcast episode is a curated in-repo file, not an upload", () => {
   assert.ok(episode);
   assert.equal(episode?.language, "en");
   assert.equal(episode?.media.kind, "file");
-  const src = curatedFileSrc(episode!);
-  assert.equal(src, "/audio/demo-episode.mp3");
+  assert.equal(episode?.audioUrl, "/audio/demo-episode.mp3");
   assert.ok((episode?.transcript.length ?? 0) > 0);
   assert.ok(
     episode?.transcript.every((cue) => cue.text && !cue.text.includes("<script")),

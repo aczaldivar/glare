@@ -91,7 +91,11 @@ export function TranscriptPanel({
           if (follow) onFollow(false);
         }}
       >
-        {visible.length === 0 ? (
+        {cues.length === 0 ? (
+          <p className="px-2 py-8 text-center text-sm text-muted">
+            No transcript for this episode.
+          </p>
+        ) : visible.length === 0 ? (
           <p className="px-2 py-8 text-center text-sm text-muted">
             No lines match that search.
           </p>
@@ -103,6 +107,7 @@ export function TranscriptPanel({
                 <li
                   key={cue.id}
                   ref={active ? activeRef : undefined}
+                  aria-current={active ? "true" : undefined}
                   className={`rounded-2xl px-3 py-3 ${
                     active ? "bg-glare/10" : "bg-transparent"
                   }`}
