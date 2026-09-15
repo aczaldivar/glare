@@ -53,12 +53,12 @@ export function TranscriptPanel({
 
   return (
     <section className="panel flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px]">
-      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
-        <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
-            Searchable · English
-          </p>
+      <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
+        <div className="min-w-0 flex-1">
           <h2 className="text-sm text-ink">Transcript (same conversation)</h2>
+          <p className="mt-1 text-[11px] leading-4 text-muted">
+            Automated or edited transcript — may contain errors. Chat about it — don’t dump large copyrighted text into the room.
+          </p>
         </div>
         <button
           type="button"

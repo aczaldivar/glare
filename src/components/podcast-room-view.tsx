@@ -193,11 +193,11 @@ function PodcastRoomLive({ episode }: { episode: PodcastEpisode }) {
       notice={channel.notice}
       send={channel.send}
       quoteSeed={quoteSeed}
-      emptyTitle="Read, listen, or both"
-      emptyBody="Quote a transcript line if you are citing it. Anyone with the link can walk in."
+      emptyTitle="Listen together — takes, questions, and short quotes welcome."
+      emptyBody="Don’t paste the whole transcript."
       emptyHint="Public room. Be decent with the people who walk in."
-      placeholder="Quote a line, then add your take"
-      helperText="Quote the transcript to cite a line. Public room — be decent."
+      placeholder="React or quote a line — don’t paste the whole transcript."
+      helperText="React or quote a line — don’t paste the whole transcript."
       softNudges={ETHICS_SOFT_NUDGES}
       onShare={shareRoom}
       copied={copied}
