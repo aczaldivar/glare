@@ -1,14 +1,23 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { OPERATOR_LEGAL_ADDRESS } from "./constants";
 import {
+  GUIDELINES,
   LEGAL_ACK_VERSION,
   LEGAL_DRAFT_DISCLAIMER,
   PRIVACY,
   TERMS,
 } from "./legal";
 
+function sectionBody(
+  doc: { sections: { heading: string; body: string[] }[] },
+  heading: string,
+) {
+  return doc.sections.find((section) => section.heading === heading);
+}
+
 function podcastSection(doc: { sections: { heading: string; body: string[] }[] }) {
-  return doc.sections.find((section) => section.heading === "Podcast rooms");
+  return sectionBody(doc, "Podcast rooms");
 }
 
 test("podcast addendum is in Terms and Privacy, not a docs-unpatched blocker", () => {
@@ -36,4 +45,28 @@ test("podcast addendum is in Terms and Privacy, not a docs-unpatched blocker", (
 
 test("legal acknowledgment version is bumped for the podcast addendum", () => {
   assert.ok(LEGAL_ACK_VERSION >= 3);
+});
+
+test("Terms, Privacy, and Guidelines contact include operator email and postal address", () => {
+  for (const doc of [TERMS, PRIVACY, GUIDELINES]) {
+    const contact = sectionBody(doc, "Contact");
+    assert.ok(contact);
+    const text = contact.body.join(" ");
+    assert.match(text, /contact@glare\.com/);
+    assert.ok(text.includes(OPERATOR_LEGAL_ADDRESS));
+    assert.doesNotMatch(text, /feedback@glare\.com/);
+  }
+});
+
+test("Terms governing law names California and a California venue", () => {
+  const governing = sectionBody(TERMS, "Governing law and venue");
+  assert.ok(governing);
+  const text = governing.body.join(" ");
+  assert.match(text, /laws of the State of California, USA/);
+  assert.match(text, /courts located in California/);
+  assert.match(text, /product draft/i);
+});
+
+test("legal acknowledgment version is bumped for operator address and governing law", () => {
+  assert.ok(LEGAL_ACK_VERSION >= 4);
 });

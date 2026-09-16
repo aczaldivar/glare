@@ -2,6 +2,8 @@ export const APP_NAME = "Glare Room";
 export const APP_SHORT_NAME = "Glareroom";
 export const DEFAULT_SITE_URL = "https://glareroom.vercel.app";
 export const DEFAULT_OPERATOR_CONTACT_EMAIL = "contact@glare.com";
+export const OPERATOR_LEGAL_ADDRESS =
+  "580 W. Monterey Ave., P.O. Box 524, Pomona, CA 91769";
 
 export const MAX_MESSAGE_LENGTH = 500;
 export const MAX_NAME_LENGTH = 24;
