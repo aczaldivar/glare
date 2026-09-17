@@ -4,7 +4,11 @@ import type { PodcastEpisode } from "./types";
  * Counsel APPROVE 2026-09-16 — Open Tab Ep. 1 for room `news-ep1`
  * (bar `news_culture`). Curated Glare original; not user-submitted.
  * Audio lives at public/audio/open-tab-ep1.mp3.
- * Demo `lobby-ep1` remains a separate catalog entry.
+ * Cue startMs/endMs come from the Counsel packet and are contiguous
+ * (endMs[i] === startMs[i+1]) so timeupdate highlight/follow-scroll
+ * tracks the spoken line the same way as lobby-ep1. Spot-checked
+ * against the MP3 at beginning, middle, and end. Demo `lobby-ep1`
+ * remains a separate catalog entry.
  */
 export const OPEN_TAB_EP1: PodcastEpisode = {
   roomSlug: "news-ep1",
