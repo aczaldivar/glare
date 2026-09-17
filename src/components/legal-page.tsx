@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { GlareMark } from "@/components/glare-mark";
 import { SiteFooter } from "@/components/site-footer";
 import {
@@ -7,6 +8,26 @@ import {
   type LegalDoc,
 } from "@/lib/legal";
 import { getOperatorContactEmail } from "@/lib/operator";
+
+function textWithMailto(text: string, email: string): ReactNode {
+  if (!text.includes(email)) return text;
+
+  const parts = text.split(email);
+  return parts.flatMap((part, index) =>
+    index === 0
+      ? [part]
+      : [
+          <a
+            key={`${email}-${index}`}
+            href={`mailto:${email}`}
+            className="text-glare underline-offset-4 hover:underline"
+          >
+            {email}
+          </a>,
+          part,
+        ],
+  );
+}
 
 export function LegalPage({ doc }: { doc: LegalDoc }) {
   const operatorEmail = getOperatorContactEmail();
@@ -41,28 +62,16 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
               <h2 className="font-display text-2xl italic text-ink">
                 {section.heading}
               </h2>
-              {section.heading === "Contact" ? (
-                <p className="mt-3 text-[15px] leading-7 text-muted">
-                  Email{" "}
-                  <a
-                    href={`mailto:${operatorEmail}`}
-                    className="text-glare underline-offset-4 hover:underline"
-                  >
-                    {operatorEmail}
-                  </a>{" "}
-                  about this page. You can also use Report in a room to flag abuse
-                  on this instance.
+              {section.body.map((paragraph) => (
+                <p
+                  key={paragraph}
+                  className="mt-3 text-[15px] leading-7 text-muted"
+                >
+                  {section.heading === "Contact"
+                    ? textWithMailto(paragraph, operatorEmail)
+                    : paragraph}
                 </p>
-              ) : (
-                section.body.map((paragraph) => (
-                  <p
-                    key={paragraph}
-                    className="mt-3 text-[15px] leading-7 text-muted"
-                  >
-                    {paragraph}
-                  </p>
-                ))
-              )}
+              ))}
             </section>
           ))}
         </div>
