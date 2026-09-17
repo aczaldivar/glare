@@ -18,9 +18,9 @@ Walk in → name or join a room → talk live → share the room link.
 - Safety basics: 13+ notice (not age verification), Community Guidelines / Terms acknowledgment before entering a room, 500-character messages, burst rate limits, Cloudflare Turnstile when configured, a honeypot on entry forms, plain-text only, in-app report stub, mute/block in this browser
 - In-app **Terms of Service**, **Privacy**, and **Community Guidelines** (plain-language product drafts)
 - Footer links to those pages; no analytics or advertising cookies in v1
-- **Podcast rooms:** operator-curated episode + transcript + live chat at `/r/lobby-ep1`. Official embeds or rights-clear in-repo audio only; no user media uploads. Chat is UGC under the Guidelines.
+- **Podcast rooms:** operator-curated episode + transcript + live chat at `/r/lobby-ep1` (demo) and `/r/news-ep1` (Open Tab Ep. 1). Official embeds or rights-clear in-repo audio only; no user media uploads. Chat is UGC under the Guidelines.
 
-Featured room to share: `/r/lobby`. Demo podcast room: `/r/lobby-ep1`.
+Featured room to share: `/r/lobby`. Demo podcast room: `/r/lobby-ep1`. Curated culture episode: `/r/news-ep1`.
 
 ## Stack
 
@@ -195,7 +195,7 @@ A room slug can be tied to a catalog episode: HTML5 audio from `/audio/`, a full
 
 Terms and Privacy include this addendum, so podcast rooms are **not blocked solely because the documents were unpatched**. Formal lawyer review is still recommended for liability, a DMCA process if user uploads are ever added, and vendor data-processing agreements. There is no upload UI and no open submission path.
 
-Demo: catalog episode `lobby-ep1` + `public/audio/demo-episode.mp3` (royalty-free generated tones) + in-repo transcript in `src/lib/podcast/demo-episode.ts`. Transcript is sanitized to plain text before render (no raw HTML). An approved official embed plus in-repo transcript is the other allowed shape; v1 playback is wired for files.
+Demo: catalog episode `lobby-ep1` + `public/audio/demo-episode.mp3` (royalty-free generated tones) + in-repo transcript in `src/lib/podcast/demo-episode.ts`. Counsel-approved original: `news-ep1` + `public/audio/open-tab-ep1.mp3` + `src/lib/podcast/open-tab-ep1.ts`. Transcript is sanitized to plain text before render (no raw HTML). An approved official embed plus in-repo transcript is the other allowed shape; v1 playback is wired for files.
 
 Ethics UX in the room: **Quote** is the cite path (a transcript line is copied into chat); empty chat and the composer helper use a light civility nudge (not a filter); optional `contentWarning` on the episode shows a banner. There is no profanity or “smart” content filter in v1.
 

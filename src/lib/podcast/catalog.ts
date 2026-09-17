@@ -1,4 +1,5 @@
 import { DEMO_EPISODE } from "./demo-episode";
+import { OPEN_TAB_EP1 } from "./open-tab-ep1";
 import { sanitizeTranscriptText } from "./sanitize";
 import {
   curatedFileSrc,
@@ -9,9 +10,10 @@ import {
 /**
  * Counsel v1: curated catalog only. No upload API, no user-submitted
  * audio or transcripts. Entries must be in-repo /audio files or an
- * official embed. Prefer shipping the file in-repo (see DEMO_EPISODE).
+ * official embed. Prefer shipping the file in-repo (see DEMO_EPISODE,
+ * OPEN_TAB_EP1).
  */
-const RAW_CATALOG: PodcastEpisode[] = [DEMO_EPISODE];
+const RAW_CATALOG: PodcastEpisode[] = [DEMO_EPISODE, OPEN_TAB_EP1];
 
 function isAllowedMedia(episode: PodcastEpisode) {
   if (episode.media.kind === "file") {

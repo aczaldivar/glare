@@ -11,6 +11,7 @@ test("slugifyRoom normalizes names into shareable slugs", () => {
 
 test("isValidRoomSlug accepts public room names", () => {
   assert.equal(isValidRoomSlug("lobby-ep1"), true);
+  assert.equal(isValidRoomSlug("news-ep1"), true);
   assert.equal(isValidRoomSlug("afterhours"), true);
   assert.equal(isValidRoomSlug("hi"), true);
   assert.equal(isValidRoomSlug("a"), false);

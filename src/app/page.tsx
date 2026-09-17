@@ -61,6 +61,16 @@ export default function Home() {
                   Demo episode
                 </span>
               </Link>
+              <Link
+                href={roomPath("news-ep1")}
+                title="Open Tab — Ep. 1: What Stuck"
+                className="inline-flex min-h-11 items-center rounded-full border border-glare/30 px-4 text-sm text-glare transition hover:border-glare/60 hover:text-glare-hot"
+              >
+                #news-ep1
+                <span className="ml-2 hidden text-xs text-muted/70 lg:inline">
+                  Open Tab Ep. 1
+                </span>
+              </Link>
             </div>
             <p className="mt-5 text-xs leading-5 text-ember">{SAFETY_BANNER}</p>
           </div>
