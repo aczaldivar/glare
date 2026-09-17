@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { getPodcastEpisode, prepareCatalogEpisode } from "./catalog";
 import { DEMO_EPISODE } from "./demo-episode";
+import { OPEN_TAB_EP1 } from "./open-tab-ep1";
 import { sanitizeTranscriptText } from "./sanitize";
 import { isCuratedAudioPath } from "./types";
 
@@ -21,6 +22,7 @@ test("demo podcast episode is a curated in-repo file, not an upload", () => {
 
 test("curated audio paths must stay under /audio/", () => {
   assert.equal(isCuratedAudioPath("/audio/demo-episode.mp3"), true);
+  assert.equal(isCuratedAudioPath("/audio/open-tab-ep1.mp3"), true);
   assert.equal(isCuratedAudioPath("/audio/../secret.mp3"), false);
   assert.equal(isCuratedAudioPath("https://example.com/track.mp3"), false);
   assert.equal(isCuratedAudioPath("/uploads/user.mp3"), false);
@@ -31,6 +33,38 @@ test("demo audio file is shipped in public/audio", () => {
     existsSync(join(process.cwd(), "public/audio/demo-episode.mp3")),
     true,
   );
+});
+
+test("open tab ep1 is a curated in-repo file with Counsel cues", () => {
+  const episode = getPodcastEpisode("news-ep1");
+  assert.ok(episode);
+  assert.equal(episode?.roomSlug, "news-ep1");
+  assert.equal(episode?.title, "Open Tab — Ep. 1: What Stuck");
+  assert.equal(episode?.language, "en");
+  assert.equal(episode?.media.kind, "file");
+  assert.equal(episode?.audioUrl, "/audio/open-tab-ep1.mp3");
+  assert.equal(episode?.media.src, "/audio/open-tab-ep1.mp3");
+  assert.equal(episode?.durationMs, 180_800);
+  assert.equal(episode?.contentWarning, undefined);
+  assert.deepEqual(episode?.transcript, OPEN_TAB_EP1.transcript);
+});
+
+test("open tab audio file is shipped in public/audio", () => {
+  assert.equal(
+    existsSync(join(process.cwd(), "public/audio/open-tab-ep1.mp3")),
+    true,
+  );
+});
+
+test("demo lobby-ep1 remains a separate catalog entry", () => {
+  const demo = getPodcastEpisode("lobby-ep1");
+  const news = getPodcastEpisode("news-ep1");
+  assert.ok(demo);
+  assert.ok(news);
+  assert.equal(demo?.audioUrl, "/audio/demo-episode.mp3");
+  assert.equal(news?.audioUrl, "/audio/open-tab-ep1.mp3");
+  assert.notEqual(demo?.roomSlug, news?.roomSlug);
+  assert.equal(demo?.title, DEMO_EPISODE.title);
 });
 
 test("content warnings are sanitized as plain text", () => {
