@@ -1,6 +1,9 @@
-import { OPERATOR_LEGAL_ADDRESS } from "@/lib/constants";
+import {
+  DEFAULT_OPERATOR_CONTACT_EMAIL,
+  OPERATOR_LEGAL_ADDRESS,
+} from "@/lib/constants";
 
-export const LEGAL_ACK_VERSION = 4;
+export const LEGAL_ACK_VERSION = 5;
 export const LEGAL_ACK_STORAGE_KEY = "glare.legal.ack.v1";
 export const LEGAL_ACK_EVENT = "glare-legal-ack";
 export const BLOCKS_STORAGE_KEY = "glare.blocks.v1";
@@ -81,7 +84,7 @@ export const GUIDELINES: LegalDoc = {
     {
       heading: "If something is wrong",
       body: [
-        "Use Report on a message or person, or email contact@glare.com. That logs a report for the operator. Mute or block someone locally in your browser if you do not want to see them.",
+        `Use Report on a message or person, or email ${DEFAULT_OPERATOR_CONTACT_EMAIL}. That logs a report for the operator. Mute or block someone locally in your browser if you do not want to see them.`,
         "Reporting is not a substitute for contacting law enforcement if someone is in immediate danger.",
       ],
     },
@@ -95,7 +98,7 @@ export const GUIDELINES: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        "Email contact@glare.com about these guidelines. You can also use Report in a room to flag abuse on this instance.",
+        `Email ${DEFAULT_OPERATOR_CONTACT_EMAIL} about these guidelines. You can also use Report in a room to flag abuse on this instance.`,
         `Postal address: ${OPERATOR_LEGAL_ADDRESS}.`,
       ],
     },
@@ -177,7 +180,7 @@ export const TERMS: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        "Email contact@glare.com about these terms. You can also use Report in a room to flag abuse on this instance.",
+        `Email ${DEFAULT_OPERATOR_CONTACT_EMAIL} about these terms. You can also use Report in a room to flag abuse on this instance.`,
         `Postal address: ${OPERATOR_LEGAL_ADDRESS}.`,
       ],
     },
@@ -262,7 +265,7 @@ export const PRIVACY: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        "Email contact@glare.com about this policy, privacy questions, or legal requests. You can also use Report in a room to flag abuse on this instance.",
+        `Email ${DEFAULT_OPERATOR_CONTACT_EMAIL} about this policy, privacy questions, or legal requests. You can also use Report in a room to flag abuse on this instance.`,
         `Postal address: ${OPERATOR_LEGAL_ADDRESS}.`,
       ],
     },
