@@ -1,6 +1,6 @@
 import { OPERATOR_LEGAL_ADDRESS } from "@/lib/constants";
 
-export const LEGAL_ACK_VERSION = 4;
+export const LEGAL_ACK_VERSION = 5;
 export const LEGAL_ACK_STORAGE_KEY = "glare.legal.ack.v1";
 export const LEGAL_ACK_EVENT = "glare-legal-ack";
 export const BLOCKS_STORAGE_KEY = "glare.blocks.v1";
@@ -8,7 +8,7 @@ export const BLOCKS_EVENT = "glare-blocks";
 export const HIDDEN_MESSAGES_STORAGE_KEY = "glare.hidden-messages.v1";
 export const HIDDEN_MESSAGES_EVENT = "glare-hidden-messages";
 
-export const LEGAL_EFFECTIVE_DATE = "September 16, 2026";
+export const LEGAL_EFFECTIVE_DATE = "September 17, 2026";
 
 export const LEGAL_DRAFT_DISCLAIMER =
   "This is a product draft written for Glare Room, not formal legal advice. Podcast rooms are covered by the curated-only addendum on these pages, so they are not blocked solely because the documents were unpatched. Formal lawyer review is still recommended for liability, a DMCA process if user uploads are ever added, and vendor data-processing agreements (hosting and realtime).";
@@ -81,7 +81,7 @@ export const GUIDELINES: LegalDoc = {
     {
       heading: "If something is wrong",
       body: [
-        "Use Report on a message or person, or email contact@glare.com. That logs a report for the operator. Mute or block someone locally in your browser if you do not want to see them.",
+        "Use Report on a message or person, or email contact@glareroom.com. That logs a report for the operator. Mute or block someone locally in your browser if you do not want to see them.",
         "Reporting is not a substitute for contacting law enforcement if someone is in immediate danger.",
       ],
     },
@@ -95,7 +95,7 @@ export const GUIDELINES: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        "Email contact@glare.com about these guidelines. You can also use Report in a room to flag abuse on this instance.",
+        "Email contact@glareroom.com about these guidelines. You can also use Report in a room to flag abuse on this instance.",
         `Postal address: ${OPERATOR_LEGAL_ADDRESS}.`,
       ],
     },
@@ -177,7 +177,7 @@ export const TERMS: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        "Email contact@glare.com about these terms. You can also use Report in a room to flag abuse on this instance.",
+        "Email contact@glareroom.com about these terms. You can also use Report in a room to flag abuse on this instance.",
         `Postal address: ${OPERATOR_LEGAL_ADDRESS}.`,
       ],
     },
@@ -262,7 +262,7 @@ export const PRIVACY: LegalDoc = {
     {
       heading: "Contact",
       body: [
-        "Email contact@glare.com about this policy, privacy questions, or legal requests. You can also use Report in a room to flag abuse on this instance.",
+        "Email contact@glareroom.com about this policy, privacy questions, or legal requests. You can also use Report in a room to flag abuse on this instance.",
         `Postal address: ${OPERATOR_LEGAL_ADDRESS}.`,
       ],
     },

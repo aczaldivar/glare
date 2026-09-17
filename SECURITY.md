@@ -14,8 +14,8 @@ This repository is public.
 
 - Do **not** paste user chat, display names tied to a real person, IP addresses, emails, or other PII into GitHub issues or pull requests.
 - Do **not** file abuse reports here or paste report payloads.
-- Use the in-app **Report** action in a room, or email the operator at **contact@glare.com**.
+- Use the in-app **Report** action in a room, or email the operator at **contact@glareroom.com**.
 
 ## Vulnerabilities
 
-If you believe you found a security problem in Glare Room, email **contact@glare.com**. Do not open a public GitHub issue with exploit details, payloads, or steps that would help someone abuse the live chat.
+If you believe you found a security problem in Glare Room, email **contact@glareroom.com**. Do not open a public GitHub issue with exploit details, payloads, or steps that would help someone abuse the live chat.

@@ -60,8 +60,8 @@ See `.env.example`.
 | --- | --- | --- |
 | `ABLY_API_KEY` | Production (Vercel) | Ably app API key with publish, subscribe, and presence |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical URL for metadata and share previews. Local: `http://localhost:3000`. Live: `https://glareroom.vercel.app` |
-| `OPERATOR_CONTACT_EMAIL` | Optional | Operator inbox. Defaults to `contact@glare.com` (also hardcoded in legal copy and the footer). Override only if the inbox changes. |
-| `NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL` | Optional | Same as above if you want to set the public value explicitly. If omitted, `OPERATOR_CONTACT_EMAIL` (or the `contact@glare.com` default) is copied into the client bundle at build time. |
+| `OPERATOR_CONTACT_EMAIL` | Optional | Operator inbox. Defaults to `contact@glareroom.com` (also hardcoded in legal copy and the footer). Override only if the inbox changes. |
+| `NEXT_PUBLIC_OPERATOR_CONTACT_EMAIL` | Optional | Same as above if you want to set the public value explicitly. If omitted, `OPERATOR_CONTACT_EMAIL` (or the `contact@glareroom.com` default) is copied into the client bundle at build time. |
 | `UPSTASH_REDIS_REST_URL` | Recommended on Vercel | Shared rate-limit store. Without it, limits are in-memory per serverless isolate. |
 | `UPSTASH_REDIS_REST_TOKEN` | With the URL above | Upstash REST token for the shared limiter. |
 | `TURNSTILE_SECRET_KEY` | Recommended on Vercel | Cloudflare Turnstile secret. Required (with the site key) before real traffic. Missing on Vercel fails closed. |
@@ -69,7 +69,7 @@ See `.env.example`.
 
 ### Operator contact
 
-Legal pages, the site footer, and support copy use **contact@glare.com**.
+Legal pages, the site footer, and support copy use **contact@glareroom.com**.
 
 `OPERATOR_CONTACT_EMAIL` defaults to that address. Set it in Vercel only if you need to override it, then redeploy.
 
@@ -138,7 +138,7 @@ For a shared limit, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` 
 5. Add environment variables (Production, Preview, and Development):
    - `ABLY_API_KEY` = your Ably key
    - `NEXT_PUBLIC_SITE_URL` = `https://glareroom.vercel.app` (or the URL you actually get)
-   - `OPERATOR_CONTACT_EMAIL` = `contact@glare.com` (app default; override only if the inbox changes)
+   - `OPERATOR_CONTACT_EMAIL` = `contact@glareroom.com` (app default; override only if the inbox changes)
    - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` = recommended so rate limits are shared across serverless instances
    - `TURNSTILE_SECRET_KEY` / `NEXT_PUBLIC_TURNSTILE_SITE_KEY` = recommended before real traffic; without both, this Vercel deploy fails closed for tokens and chat writes
 6. **Claim the public URL**
@@ -147,7 +147,7 @@ For a shared limit, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` 
    - If it is not, click **Add Domain** and enter `glareroom.vercel.app`
    - If that name is already taken on Vercel, add the closest available name (`glare-room.vercel.app`, `glareroom-app.vercel.app`, or a custom domain) and set `NEXT_PUBLIC_SITE_URL` to match
 7. Deploy. Vercel builds on every push to the production branch.
-8. `/guidelines`, `/terms`, and `/privacy` now include a **podcast-rooms addendum** (operator-curated episodes, official embeds or rights-clear in-repo audio, transcripts shipped with episodes, no user media uploads, chat as UGC). They remain product drafts. Formal lawyer review is still recommended for **liability**, a **DMCA process if user uploads are ever added**, and **vendor DPAs** (Vercel, Ably). Bump `LEGAL_ACK_VERSION` in `src/lib/legal.ts` if the agreement materially changes (that re-prompts people before they enter a room). Operator contact is **contact@glare.com**.
+8. `/guidelines`, `/terms`, and `/privacy` now include a **podcast-rooms addendum** (operator-curated episodes, official embeds or rights-clear in-repo audio, transcripts shipped with episodes, no user media uploads, chat as UGC). They remain product drafts. Formal lawyer review is still recommended for **liability**, a **DMCA process if user uploads are ever added**, and **vendor DPAs** (Vercel, Ably). Bump `LEGAL_ACK_VERSION` in `src/lib/legal.ts` if the agreement materially changes (that re-prompts people before they enter a room). Operator contact is **contact@glareroom.com**.
 9. Smoke-test: open the site → confirm the 13+ notice → agree to Guidelines/Terms → **Open lobby** (or create a room) → send a message in two browser windows → **Share link** → **Mute** / **Block** / **Report** on a message.
 
 Redeploy after changing env vars so `NEXT_PUBLIC_SITE_URL` and the operator email are baked into the client bundle.
@@ -189,7 +189,7 @@ Counsel constraints for v1, now reflected in `/terms` and `/privacy`:
 - **Official embeds** or **rights-clear in-repo audio**, with a **transcript provided with the episode**
 - **No user audio, transcript, or other media uploads**
 - **Chat is user-generated content** under the Community Guidelines
-- Legal contact: **contact@glare.com**
+- Legal contact: **contact@glareroom.com**
 
 A room slug can be tied to a catalog episode: HTML5 audio from `/audio/`, a full English transcript, and the same live chat. Chat is the discussion; the transcript is first-class (readable and searchable). Share `/r/{slug}`.
 
@@ -214,7 +214,7 @@ Existing legal gates still apply (13+ notice, Guidelines/Terms ack, mute/block, 
 
 The Terms of Service, Privacy Policy, and Community Guidelines in this repo are **plain-language product drafts** with a Counsel-shaped **podcast addendum** (curated embeds + transcripts + chat; no user uploads). They are **not a substitute for a lawyer-reviewed contract**.
 
-Formal lawyer review is still recommended for **liability**, a **DMCA process if user uploads are ever added**, and **vendor DPAs**. Operator contact is **contact@glare.com**. Changing the acknowledgment version in `src/lib/legal.ts` will ask returning visitors to agree again.
+Formal lawyer review is still recommended for **liability**, a **DMCA process if user uploads are ever added**, and **vendor DPAs**. Operator contact is **contact@glareroom.com**. Changing the acknowledgment version in `src/lib/legal.ts` will ask returning visitors to agree again.
 
 ## Project layout
 

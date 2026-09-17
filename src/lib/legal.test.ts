@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { OPERATOR_LEGAL_ADDRESS } from "./constants";
+import {
+  DEFAULT_OPERATOR_CONTACT_EMAIL,
+  OPERATOR_LEGAL_ADDRESS,
+} from "./constants";
 import {
   GUIDELINES,
   LEGAL_ACK_VERSION,
@@ -48,14 +51,19 @@ test("legal acknowledgment version is bumped for the podcast addendum", () => {
 });
 
 test("Terms, Privacy, and Guidelines contact include operator email and postal address", () => {
+  assert.equal(DEFAULT_OPERATOR_CONTACT_EMAIL, "contact@glareroom.com");
   for (const doc of [TERMS, PRIVACY, GUIDELINES]) {
     const contact = sectionBody(doc, "Contact");
     assert.ok(contact);
     const text = contact.body.join(" ");
-    assert.match(text, /contact@glare\.com/);
+    assert.match(text, /contact@glareroom\.com/);
     assert.ok(text.includes(OPERATOR_LEGAL_ADDRESS));
+    assert.doesNotMatch(text, /contact@glare\.com/);
     assert.doesNotMatch(text, /feedback@glare\.com/);
+    assert.doesNotMatch(text, /feedback@glareroom\.com/);
   }
+  const guidelinesText = GUIDELINES.sections.flatMap((section) => section.body).join(" ");
+  assert.match(guidelinesText, /email contact@glareroom\.com/);
 });
 
 test("Terms governing law names California and a California venue", () => {
@@ -69,4 +77,8 @@ test("Terms governing law names California and a California venue", () => {
 
 test("legal acknowledgment version is bumped for operator address and governing law", () => {
   assert.ok(LEGAL_ACK_VERSION >= 4);
+});
+
+test("legal acknowledgment version is bumped for glareroom.com operator contact", () => {
+  assert.ok(LEGAL_ACK_VERSION >= 5);
 });
